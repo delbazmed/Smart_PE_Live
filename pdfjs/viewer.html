@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4">
+<title>عارض الدرس</title>
+<style>
+  html,body{margin:0;padding:0;background:#525659;height:100%}
+  #wrap{padding:10px 0 28px;text-align:center}
+  .pg{display:block;margin:0 auto 10px;max-width:98%;height:auto;
+      box-shadow:0 2px 10px rgba(0,0,0,.45);background:#fff}
+  #st{color:#e8edf2;font-family:system-ui,'Segoe UI',Tahoma,sans-serif;
+      font-size:14px;padding:26px 16px;line-height:1.7}
+  .spin{width:26px;height:26px;border:3px solid rgba(255,255,255,.25);
+        border-top-color:#27d3a4;border-radius:50%;display:inline-block;
+        animation:sp .8s linear infinite;vertical-align:middle;margin-inline-start:8px}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  @media print{
+    body{background:#fff}
+    #st{display:none}
+    .pg{box-shadow:none;margin:0 auto;page-break-after:always;max-width:100%}
+  }
+</style>
+</head>
+<body>
+<div id="st">جارٍ تحميل الدرس <span class="spin"></span></div>
+<div id="wrap"></div>
+<script type="module">
+import * as pdfjsLib from './pdf.min.mjs';
+pdfjsLib.GlobalWorkerOptions.workerSrc = './pdf.worker.min.mjs';
+
+function qp(k){ return new URLSearchParams(location.search).get(k); }
+var file = qp('file');
+var st = document.getElementById('st');
+var wrap = document.getElementById('wrap');
+var DPR = window.devicePixelRatio || 1;
+var RS = Math.min(DPR * 1.5, 3);                 // حدّة عالية للنص العربي مع سقف آمن
+var targetW = Math.min(window.innerWidth - 8, 1400);
+var _pdf = null;
+
+function renderInto(holder){
+  if(holder.dataset.done==='1' || holder.dataset.busy==='1') return;
+  holder.dataset.busy='1';
+  _pdf.getPage(+holder.dataset.page).then(function(page){
+    var base = page.getViewport({ scale: 1 });
+    var cssScale = targetW / base.width;
+    var vp = page.getViewport({ scale: cssScale * RS });
+    var canvas = document.createElement('canvas');
+    canvas.width = vp.width; canvas.height = vp.height;
+    canvas.style.width='100%'; canvas.style.display='block';
+    var ctx = canvas.getContext('2d', { alpha:false });
+    ctx.imageSmoothingEnabled=true; ctx.imageSmoothingQuality='high';
+    page.render({ canvasContext: ctx, viewport: vp }).promise.then(function(){
+      holder.innerHTML=''; holder.appendChild(canvas);
+      holder.dataset.done='1'; holder.dataset.busy='';
+    }).catch(function(){ holder.dataset.busy=''; });
+  }).catch(function(){ holder.dataset.busy=''; });
+}
+function unload(holder){
+  if(holder.dataset.done==='1'){
+    var h=holder.getBoundingClientRect().height;
+    holder.style.height=h+'px';
+    holder.innerHTML=''; holder.dataset.done='';
+  }
+}
+function render(){
+  if(!file){ st.textContent='لا يوجد ملف.'; return; }
+  pdfjsLib.getDocument({ url:file }).promise.then(function(pdf){
+    _pdf=pdf; st.innerHTML='';
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting) renderInto(e.target); });
+    }, { rootMargin:'1200px 0px', threshold:0.01 });
+    var farIO=new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(!e.isIntersecting) unload(e.target); });
+    }, { rootMargin:'2600px 0px', threshold:0 });
+    pdf.getPage(1).then(function(p1){
+      var vp1=p1.getViewport({ scale:1 });
+      var ratio=vp1.height/vp1.width;
+      var dispW=Math.min(wrap.clientWidth||targetW, targetW);
+      for(var n=1;n<=pdf.numPages;n++){
+        var holder=document.createElement('div');
+        holder.className='pg'; holder.dataset.page=n;
+        holder.style.width='100%';
+        holder.style.height=(dispW*ratio)+'px';
+        wrap.appendChild(holder);
+        io.observe(holder); farIO.observe(holder);
+      }
+    });
+  }).catch(function(){
+    st.innerHTML='تعذّر عرض الملف. <br><a style="color:#27d3a4" href="'+file+'">فتح الملف مباشرة</a>';
+  });
+}
+render();
+
+function renderAllThen(cb){
+  var holders=[].slice.call(document.querySelectorAll('.pg'));
+  var i=0;
+  (function step(){
+    // render sequentially to bound memory, skip already done
+    var pending=holders.filter(function(h){return h.dataset.done!=='1';});
+    if(!pending.length){ cb(); return; }
+    var h=pending[0];
+    h.dataset.busy='';
+    _pdf.getPage(+h.dataset.page).then(function(page){
+      var base=page.getViewport({scale:1});
+      var cssScale=targetW/base.width;
+      var vp=page.getViewport({scale:cssScale*RS});
+      var c=document.createElement('canvas');
+      c.width=vp.width;c.height=vp.height;c.style.width='100%';c.style.display='block';
+      var ctx=c.getContext('2d',{alpha:false});
+      page.render({canvasContext:ctx,viewport:vp}).promise.then(function(){
+        h.innerHTML='';h.appendChild(c);h.dataset.done='1';h.style.height='';
+        setTimeout(step,0);
+      });
+    });
+  })();
+}
+
+window.addEventListener('message', function(ev){
+  if(ev.data==='print'){
+    st.style.display='none';
+    renderAllThen(function(){ window.focus(); window.print(); });
+  }
+});
+</script>
+</body>
+</html>
