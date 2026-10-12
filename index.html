@@ -197,6 +197,34 @@ tfoot td.name{background:#e7edf4;color:var(--muted);font-size:10px}
 .cls-item .ci-t span{font-size:10.5px;color:var(--muted)}
 .cls-item .ci-del{border:none;background:var(--red-soft);color:var(--red);width:30px;height:30px;border-radius:9px;cursor:pointer;font-size:15px;font-weight:800}
 .cls-empty{font-size:11px;color:var(--muted);text-align:center;padding:14px;font-weight:600}
+.cls-item .ci-edit{border:none;background:var(--mint-soft);color:var(--mint-d);width:30px;height:30px;border-radius:9px;cursor:pointer;font-size:14px;font-weight:800;margin-left:6px}
+.cls-item .ci-edit:active,.cls-item .ci-del:active{transform:scale(.9)}
+/* ===== نافذة إدارة الفوج ===== */
+.cm-card{width:100%;max-width:460px;max-height:88vh;background:#fff;border-radius:20px;overflow:hidden;
+  display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,.4);border:1px solid rgba(39,211,164,.35)}
+.cm-head{display:flex;align-items:center;gap:10px;padding:13px 15px;background:var(--grad);color:#fff;flex-shrink:0}
+.cm-ttl{flex:1;font-family:var(--fh);font-weight:800;font-size:15px}
+.cm-x{border:none;background:rgba(255,255,255,.18);color:#fff;width:30px;height:30px;border-radius:9px;cursor:pointer;font-size:14px}
+.cm-body{padding:14px 15px;overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1}
+.cm-add{display:flex;gap:7px;margin:12px 0 10px}
+.cm-add input{flex:1;min-width:0}
+.cm-add button{border:none;border-radius:10px;background:var(--grad);color:#fff;font-family:var(--fh);
+  font-weight:800;font-size:13px;padding:0 14px;cursor:pointer;flex-shrink:0}
+.cm-add button:active{transform:scale(.95)}
+.cm-cnt{font-size:11.5px;color:var(--muted);font-weight:700;margin-bottom:6px}
+.cm-row{display:flex;align-items:center;gap:7px;margin-bottom:6px}
+.cm-num{width:26px;height:30px;display:grid;place-items:center;font-family:var(--fh);font-weight:800;
+  font-size:11px;color:var(--muted);flex-shrink:0}
+.cm-row input{flex:1;min-width:0;font-size:13px;padding:7px 10px}
+.cm-del{border:none;background:var(--red-soft);color:var(--red);width:30px;height:30px;border-radius:9px;
+  cursor:pointer;font-size:14px;font-weight:800;flex-shrink:0}
+.cm-del:active{transform:scale(.9)}
+.cm-foot{padding:12px 15px;border-top:1px solid var(--line);flex-shrink:0;background:#fafcfe}
+.cm-warn{background:#fff4dd;color:#8a6d1b;border-radius:10px;padding:8px 11px;font-size:11px;
+  font-weight:600;margin-bottom:10px;line-height:1.6}
+body.dark .cm-card{background:#13212f}
+body.dark .cm-foot{background:#0f1c28;border-color:#26384a}
+body.dark .cm-warn{background:#2a2410;color:#e0c067}
 .cloud-status{font-size:12px;font-weight:700;padding:10px 12px;border-radius:10px;background:#f7f9fc;border:1px solid var(--line);color:var(--muted);margin-top:10px}
 .cloud-status.on{background:var(--mint-soft);border-color:var(--mint);color:var(--mint-d)}
 /* update modal */
@@ -855,6 +883,34 @@ body.dark .qr-link{background:#10202c}
   <div class="pdf-frame"><iframe id="pdfFrame" title="عارض PDF"></iframe></div>
 </div>
 
+<div class="upd-ov" id="clsOv">
+  <div class="cm-card">
+    <div class="cm-head">
+      <div class="cm-ttl" id="cmTtl">إدارة الفوج</div>
+      <button class="cm-x" onclick="closeClassMgr()">✕</button>
+    </div>
+    <div class="cm-body">
+      <div class="meta-grid">
+        <div class="fld"><label>المستوى الدراسي</label>
+          <select id="cmGrade"><option>سنة أولى ثانوي</option><option>سنة ثانية ثانوي</option><option>سنة ثالثة ثانوي</option></select></div>
+        <div class="fld"><label>اسم القسم</label><input id="cmName" placeholder="مثال: 3 علوم تجريبية"></div>
+      </div>
+      <div class="cm-add">
+        <input id="cmNew" placeholder="اكتب اسم التلميذ ثم أضف..." onkeydown="if(event.key==='Enter')addStudent()">
+        <button onclick="addStudent()">＋ إضافة</button>
+      </div>
+      <div class="cm-cnt" id="cmCnt"></div>
+      <div id="cmList"></div>
+    </div>
+    <div class="cm-foot">
+      <button class="btn gen" style="width:100%" onclick="saveClassMgr()">
+        <svg viewBox="0 0 24 24" stroke="currentColor"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+        حفظ التعديلات
+      </button>
+    </div>
+  </div>
+</div>
+
 <div class="upd-ov" id="guideOv">
   <div class="upd-card">
     <div class="upd-head">
@@ -890,9 +946,11 @@ body.dark .qr-link{background:#10202c}
 <script>
 let students=["أحمد","عمر","سارة","فاطمة","يوسف","ليلى","كريم","نور","رضا","وليد"]; // active roster (default sample)
 // ===== إصدار التطبيق وسجل التحديثات =====
-const APP_VERSION='3.0';
+const APP_VERSION='3.1';
 const CHANGELOG=[
-  {v:'الإصدار 3.0', items:[
+  {v:'الإصدار 3.1', items:[
+    'إدارة الفوج التربوي: تعديل اسم القسم والمستوى، وإضافة التلاميذ يدوياً، وتعديل أو حذف أي تلميذ.',
+    'نتائج التقويم تبقى مرتبطة بصاحبها تلقائياً عند الحذف أو الإضافة.',
     'الاستيراد يأخذ اللقب والاسم فقط، ويتجاهل الرقم وتاريخ ومكان الميلاد والجنس والملاحظات.',
     'كشف أعمدة الأسماء آلياً في PDF عبر مواضع الأعمدة، وفي Excel عبر العناوين أو الاستبعاد الذكي.',
     'استيراد الأسماء: دمج عمودَي اللقب والاسم آلياً في سطر واحد.',
@@ -1804,11 +1862,77 @@ function saveClass(){
   document.getElementById('rName').value='';document.getElementById('rNames').value='';
   toast('✓ تم حفظ الفوج: '+name+' ('+names.length+' تلميذاً)');
 }
-function delClass(id){classes=classes.filter(c=>c.id!==id);persistClasses();renderClassList();fillClassSelector();toast('تم حذف الفوج');}
+function delClass(id){
+  const c=classes.find(x=>x.id===id);
+  if(c && !confirm('حذف الفوج «'+c.name+'» نهائياً؟\nستُحذف معه نتائج التقويم الخاصة به.'))return;
+  classes=classes.filter(x=>x.id!==id);
+  Object.keys(diagMarks).forEach(function(k){ if(k.indexOf(id+'|')===0) delete diagMarks[k]; });
+  persistMarks();persistClasses();renderClassList();fillClassSelector();toast('تم حذف الفوج');
+}
+// ===== إدارة الفوج: تعديل · إضافة · حذف =====
+let _cmId=null,_cmRows=[];   // كل صف: {o: الترتيب الأصلي (-1 للجديد), n: الاسم}
+function openClassMgr(id){
+  const c=classes.find(x=>x.id===id); if(!c)return;
+  _cmId=id;
+  _cmRows=(c.names||[]).map(function(n,i){return {o:i,n:n};});
+  document.getElementById('cmTtl').textContent='إدارة الفوج: '+c.name;
+  document.getElementById('cmGrade').value=c.grade;
+  document.getElementById('cmName').value=c.name;
+  document.getElementById('cmNew').value='';
+  renderCmList();
+  document.getElementById('clsOv').classList.add('show');
+}
+function closeClassMgr(){document.getElementById('clsOv').classList.remove('show');_cmId=null;_cmRows=[];}
+function renderCmList(){
+  const box=document.getElementById('cmList'),cnt=document.getElementById('cmCnt');
+  cnt.textContent='عدد التلاميذ: '+_cmRows.length;
+  if(!_cmRows.length){box.innerHTML='<div class="cls-empty">لا يوجد تلاميذ — أضفهم من الخانة أعلاه.</div>';return;}
+  box.innerHTML=_cmRows.map(function(r,i){
+    return '<div class="cm-row"><span class="cm-num">'+(i+1)+'</span>'+
+      '<input value="'+String(r.n).replace(/"/g,'&quot;')+'" oninput="cmEdit('+i+',this.value)">'+
+      '<button class="cm-del" onclick="cmDel('+i+')" title="حذف">×</button></div>';
+  }).join('');
+}
+function cmEdit(i,v){ if(_cmRows[i])_cmRows[i].n=v; }
+function cmDel(i){
+  const r=_cmRows[i]; if(!r)return;
+  if(!confirm('حذف التلميذ «'+r.n+'» من القائمة؟'))return;
+  _cmRows.splice(i,1); renderCmList();
+}
+function addStudent(){
+  const el=document.getElementById('cmNew');
+  const raw=(el.value||'').trim();
+  if(!raw){toast('⚠️ اكتب اسم التلميذ أولاً');return;}
+  // يقبل عدّة أسماء دفعة واحدة (سطر لكل اسم)
+  const adds=raw.split('\n').map(function(s){return s.trim();}).filter(Boolean);
+  adds.forEach(function(n){_cmRows.push({o:-1,n:n});});
+  el.value=''; renderCmList();
+  toast('✓ أُضيف '+adds.length+(adds.length>1?' تلاميذ':' تلميذ'));
+}
+function saveClassMgr(){
+  const c=classes.find(x=>x.id===_cmId); if(!c){closeClassMgr();return;}
+  const nm=document.getElementById('cmName').value.trim();
+  if(!nm){toast('⚠️ أدخل اسم القسم');return;}
+  const rows=_cmRows.map(function(r){return {o:r.o,n:String(r.n).trim()};}).filter(function(r){return r.n;});
+  if(!rows.length){toast('⚠️ يجب أن يبقى تلميذ واحد على الأقل');return;}
+  // أعد ترتيب نقاط التقويم لتبقى مرتبطة بصاحبها بعد الحذف أو الإضافة
+  Object.keys(diagMarks).forEach(function(k){
+    if(k.indexOf(_cmId+'|')!==0)return;
+    const old=diagMarks[k]||[];
+    diagMarks[k]=rows.map(function(r){return (r.o>=0 && old[r.o])? old[r.o] : [];});
+  });
+  c.grade=document.getElementById('cmGrade').value;
+  c.name=nm;
+  c.names=rows.map(function(r){return r.n;});
+  persistMarks();persistClasses();renderClassList();fillClassSelector();
+  if(document.getElementById('tab1').classList.contains('on'))render();
+  closeClassMgr();
+  toast('✓ حُفظت التعديلات: '+nm+' ('+c.names.length+' تلميذاً)');
+}
 function renderClassList(){
   const box=document.getElementById('classList');if(!box)return;
   if(!classes.length){box.innerHTML='<div class="cls-empty">لا توجد أقسام محفوظة بعد.</div>';return;}
-  box.innerHTML=classes.map(c=>`<div class="cls-item"><div class="ci-ic">${c.names.length}</div><div class="ci-t"><b>${c.name}</b><span>${c.grade} · ${c.names.length} تلميذاً</span></div><button class="ci-del" onclick="delClass('${c.id}')">×</button></div>`).join('');
+  box.innerHTML=classes.map(c=>`<div class="cls-item"><div class="ci-ic">${c.names.length}</div><div class="ci-t"><b>${c.name}</b><span>${c.grade} · ${c.names.length} تلميذاً</span></div><button class="ci-edit" onclick="openClassMgr('${c.id}')" title="تعديل وإضافة تلاميذ">✎</button><button class="ci-del" onclick="delClass('${c.id}')" title="حذف الفوج">×</button></div>`).join('');
 }
 function fillClassSelector(){
   const lvl=document.getElementById('mLevel').value;
