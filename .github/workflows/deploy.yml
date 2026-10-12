@@ -1,0 +1,28 @@
+name: نشر Smart _P.E
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: النشر على Firebase Hosting
+    runs-on: ubuntu-latest
+    steps:
+      - name: جلب الملفات
+        uses: actions/checkout@v4
+
+      - name: تهيئة Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: تثبيت أدوات Firebase
+        run: npm install -g firebase-tools
+
+      - name: النشر
+        run: firebase deploy --only hosting --project pidagogiedoc --non-interactive --token "$FIREBASE_TOKEN"
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
