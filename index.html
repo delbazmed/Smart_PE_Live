@@ -410,15 +410,24 @@ body.dark .qr-link{background:#10202c}
 .jt-sess select{border:1.5px solid var(--line);border-radius:8px;padding:3px 6px;font-family:var(--fh);font-weight:700;font-size:10px;color:var(--navy);background:#fff}
 .jt-act{min-width:170px;font-size:10.5px}
 .act-k{margin-bottom:3px}.act-k b{font-family:var(--fh);color:var(--mint-d);font-weight:800}
-.act-subs{list-style:none;margin:3px 0 0;padding:0}
+.act-subs{list-style:none;margin:3px 0 0;padding:0;counter-reset:acts}
 .act-subs li{position:relative;padding-right:14px;margin-bottom:3px;line-height:1.5}
-.act-subs li::before{content:"●";position:absolute;right:2px;top:3px;font-size:6px;color:var(--mint-d)}
+.act-subs li{counter-increment:acts}
+.act-subs li::before{content:counter(acts) "." ;position:absolute;right:0;top:0;font-size:10px;font-weight:800;color:var(--mint-d)}
 .jna{color:var(--muted);font-size:10px}
 .jt-note{min-width:120px;background:#fffdf0}
 .jt-note:focus{outline:2px solid var(--mint);outline-offset:-2px}
 /* lesson plan */
 /* lesson plan editable doc */
 .rtbar{position:sticky;top:0;z-index:20;display:flex;flex-wrap:wrap;align-items:center;gap:5px;background:var(--navy);border-radius:12px;padding:8px 10px;margin-bottom:10px;box-shadow:var(--sh)}
+/* ===== عرض التمارين داخل المذكرة ===== */
+.dr{position:relative;padding-right:17px;margin-bottom:5px;line-height:1.5}
+.dr:last-child{margin-bottom:0}
+.dr-n{position:absolute;right:0;top:1px;width:13px;height:13px;border-radius:4px;background:var(--mint-d);
+  color:#fff;font-size:8.5px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;font-family:var(--fh)}
+.dr-o{color:var(--muted);font-size:.9em;margin-top:1px}
+.rt-b.on{background:var(--mint);color:#08281f}
+.rt-sel{max-width:92px}
 .rt-b{min-width:32px;height:32px;border:none;border-radius:8px;background:rgba(255,255,255,.12);color:#fff;font-family:var(--fh);font-weight:700;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:1}
 .rt-b:active{transform:scale(.9)}.rt-b small{font-size:9px}
 .rt-sel{height:32px;border:none;border-radius:8px;background:rgba(255,255,255,.12);color:#fff;font-family:var(--fh);font-weight:700;font-size:12px;padding:0 8px;cursor:pointer;outline:none}
@@ -677,21 +686,32 @@ body.dark .qr-link{background:#10202c}
         <option value="Amiri, serif">Amiri</option><option value="'Times New Roman', serif">Times</option>
         <option value="Arial, sans-serif">Arial</option>
       </select>
+      <select class="rt-sel" onmousedown="event.stopPropagation()" onchange="exec('fontSize',this.value)" title="حجم الخط">
+        <option value="">الحجم</option><option value="1">صغير جداً</option><option value="2">صغير</option>
+        <option value="3">عادي</option><option value="4">كبير</option><option value="5">كبير جداً</option>
+      </select>
       <button class="rt-b" onmousedown="return rtKeep(event)" onclick="fontStep(1)" title="تكبير">A<small>+</small></button>
       <button class="rt-b" onmousedown="return rtKeep(event)" onclick="fontStep(-1)" title="تصغير"><small>A</small>−</button>
       <span class="rt-sep"></span>
-      <button class="rt-b" onmousedown="return rtKeep(event)" onclick="exec('bold')" style="font-weight:900" title="غامق">B</button>
-      <button class="rt-b" onmousedown="return rtKeep(event)" onclick="exec('italic')" style="font-style:italic" title="مائل">I</button>
-      <button class="rt-b" onmousedown="return rtKeep(event)" onclick="exec('underline')" style="text-decoration:underline" title="تسطير">U</button>
+      <button class="rt-b" onmousedown="return rtKeep(event)" id="rtB" onclick="exec('bold')" style="font-weight:900" title="غامق">B</button>
+      <button class="rt-b" onmousedown="return rtKeep(event)" id="rtI" onclick="exec('italic')" style="font-style:italic" title="مائل">I</button>
+      <button class="rt-b" onmousedown="return rtKeep(event)" id="rtU" onclick="exec('underline')" style="text-decoration:underline" title="تسطير">U</button>
       <button class="rt-b hl" onmousedown="return rtKeep(event)" onclick="exec('hiliteColor','#fde047')" title="تظليل">🖍</button>
+      <span class="rt-sep"></span>
+      <button class="rt-b" id="rtS" onmousedown="return rtKeep(event)" onclick="exec('strikeThrough')" style="text-decoration:line-through" title="شطب">S</button>
       <span class="rt-sep"></span>
       <button class="rt-b" onmousedown="return rtKeep(event)" onclick="exec('insertUnorderedList')" title="نقاط">•≡</button>
       <button class="rt-b" onmousedown="return rtKeep(event)" onclick="exec('insertOrderedList')" title="ترقيم">1.≡</button>
+      <button class="rt-b" onmousedown="return rtKeep(event)" onclick="exec('indent')" title="إزاحة للداخل">⇤</button>
+      <button class="rt-b" onmousedown="return rtKeep(event)" onclick="exec('outdent')" title="إزاحة للخارج">⇥</button>
       <button class="rt-b" onmousedown="return rtKeep(event)" onclick="exec('justifyRight')" title="يمين">⇥</button>
       <button class="rt-b" onmousedown="return rtKeep(event)" onclick="exec('justifyCenter')" title="وسط">≡</button>
       <span class="rt-sep"></span>
       <label class="rt-color" title="لون النص"><input type="color" onmousedown="event.stopPropagation()" oninput="exec('foreColor',this.value)" value="#0c2138"><span>A</span></label>
+      <button class="rt-b" onmousedown="return rtKeep(event)" onclick="pastePlain()" title="لصق كنص عادي (بلا تنسيق)">📋</button>
       <button class="rt-b" onmousedown="return rtKeep(event)" onclick="exec('removeFormat')" title="مسح التنسيق">⌫</button>
+      <span class="rt-sep"></span>
+      <button class="rt-b" onclick="openDrills()" title="مكتبة التمارين" style="background:var(--mint);color:#08281f;font-size:12px;padding:0 9px;min-width:auto">📚 تمارين</button>
     </div>
     <div id="lessonBody"></div>
     <div class="btn-row no-print">
@@ -883,6 +903,32 @@ body.dark .qr-link{background:#10202c}
   <div class="pdf-frame"><iframe id="pdfFrame" title="عارض PDF"></iframe></div>
 </div>
 
+<div class="upd-ov" id="drOv">
+  <div class="cm-card">
+    <div class="cm-head">
+      <div class="cm-ttl">📚 مكتبة التمارين</div>
+      <button class="cm-x" onclick="closeDrills()">✕</button>
+    </div>
+    <div class="cm-body">
+      <div class="fld full"><label>المرحلة</label>
+        <select id="drPhase" onchange="renderDrills()">
+          <option value="0">الجزء التحضيري</option>
+          <option value="1" selected>الجزء الرئيسي — نشاط فردي</option>
+          <option value="2">الجزء الرئيسي — نشاط جماعي</option>
+          <option value="3">الجزء الختامي</option>
+        </select></div>
+      <div id="drInfo" class="cm-warn" style="display:none"></div>
+      <div id="drList"></div>
+    </div>
+    <div class="cm-foot">
+      <button class="btn gen" style="width:100%" onclick="insertAllDrills()">
+        <svg viewBox="0 0 24 24" stroke="currentColor"><path d="M12 5v14M5 12h14"/></svg>
+        إدراج التمارين الثلاثة في المذكرة
+      </button>
+    </div>
+  </div>
+</div>
+
 <div class="upd-ov" id="clsOv">
   <div class="cm-card">
     <div class="cm-head">
@@ -946,9 +992,13 @@ body.dark .qr-link{background:#10202c}
 <script>
 let students=["أحمد","عمر","سارة","فاطمة","يوسف","ليلى","كريم","نور","رضا","وليد"]; // active roster (default sample)
 // ===== إصدار التطبيق وسجل التحديثات =====
-const APP_VERSION='3.1';
+const APP_VERSION='3.2';
 const CHANGELOG=[
-  {v:'الإصدار 3.1', items:[
+  {v:'الإصدار 3.2', items:[
+    'مكتبة التمارين: 3 تمارين جاهزة لكل هدف — الجري السريع وكرة الطائرة (المرحلة 1).',
+    'وضعيات التعلم صارت شرح التمارين مفصّلاً، وظروف الإنجاز للعتاد والتنظيم.',
+    'الأهداف الإجرائية في الدفتر اليومي صارت مرقّمة، وكل سطر هدف مستقل.',
+    'شريط الأدوات: قائمة أحجام · شطب · إزاحة · لصق كنص عادي · إظهار الحالة النشطة.',
     'إدارة الفوج التربوي: تعديل اسم القسم والمستوى، وإضافة التلاميذ يدوياً، وتعديل أو حذف أي تلميذ.',
     'نتائج التقويم تبقى مرتبطة بصاحبها تلقائياً عند الحذف أو الإضافة.',
     'الاستيراد يأخذ اللقب والاسم فقط، ويتجاهل الرقم وتاريخ ومكان الميلاد والجنس والملاحظات.',
@@ -1030,6 +1080,71 @@ const I={
   jump:'<circle cx="14" cy="4" r="1.6"/><path d="M3 20h18M3 20l5-3 2-5 5 1M10 12l4-3 4 4"/>',
   shot:'<circle cx="9" cy="5" r="1.6"/><path d="M7 21l2-9 6 1M9 12l3-4M15 8a3 3 0 1 0 0-.01"/>'
 };
+/* ===== مكتبة التمارين — المرحلة 1: الجري السريع · كرة الطائرة =====
+   كل تمرين: d = وصف التمرين · o = التنظيم والتكرارات
+   الأنشطة غير المغطّاة تستعمل النص العام تلقائياً (لا يتعطّل شيء). */
+const DRILLS={
+  warm:{
+    sprint:[
+      {d:'جري خفيف متواصل مع تحريك المفاصل (رسغ · كاحل · ركبة · كتف) ودوران الذراعين أماماً وخلفاً.',o:'الفوج كاملاً في محيط الساحة · 4 دقائق · إيقاع هادئ.'},
+      {d:'تمارين إطالة ديناميكية: رفع الركبتين، ضرب المقعدة، خطوات واسعة مع مرجحة الذراعين.',o:'صفّان متقابلان · 3 تكرارات × 15م لكل تمرين · راحة 20 ثانية.'},
+      {d:'تسارعات تصاعدية قصيرة للوصول بالجسم إلى وتيرة السباق.',o:'أفواج ثلاثية · 3 تكرارات × 20م (50٪ ← 70٪ ← 90٪) · راحة 30 ثانية.'}
+    ],
+    volley:[
+      {d:'جري خفيف مع تحريك مفاصل الرسغين والكتفين والكاحلين تهيئةً للمس الكرة.',o:'الفوج في محيط الملعب · 4 دقائق · تغيير الاتجاه عند الصافرة.'},
+      {d:'تحركات دفاعية بخطوات جانبية وأمامية وخلفية في وضعية منخفضة دون كرة.',o:'صفوف على خط النهاية · 4 تكرارات × عرض الملعب · راحة 20 ثانية.'},
+      {d:'تمرير علوي وسفلي ثنائي بإيقاع هادئ لتهيئة الأصابع والساعدين.',o:'ثنائيات على بُعد 4م · 3 دقائق · دون إسقاط الكرة.'}
+    ]
+  },
+  cool:[
+    {d:'مشي هادئ مع تنفّس عميق (شهيق أنفي · زفير فموي) لخفض وتيرة القلب تدريجياً.',o:'الفوج في دائرة · دورتان حول الساحة · دقيقتان.'},
+    {d:'تمارين تمطّط ثابتة للعضلات العاملة مع تثبيت كل وضعية دون ارتداد.',o:'وضعية جلوس أو وقوف · 15 ثانية لكل عضلة · تنفّس منتظم.'},
+    {d:'مراجعة جماعية قصيرة لأهم النقاط المكتسبة وتصحيح الأخطاء الملاحَظة.',o:'نصف دائرة · دقيقة واحدة · مشاركة تلميذين أو ثلاثة.'}
+  ],
+  main:{
+    sprint:[
+      [ {d:'انطلاق من وضعيات مختلفة (وقوف · جلوس · انبطاح) عند سماع الصافرة والجري 15م بأقصى سرعة.',o:'أفواج رباعية · 4 تكرارات لكل وضعية · راحة 45 ثانية.'},
+        {d:'أخذ الوضعية المنخفضة على المكعّبات وتنفيذ الأوامر الثلاثة مع الانطلاق فور الإشارة.',o:'ثنائيات (منفّذ ومُلاحِظ) · 5 محاولات لكل تلميذ · تبادل الأدوار.'},
+        {d:'سباق تنافسي ثنائي على 20م انطلاقاً من الوضعية المنخفضة لقياس سرعة رد الفعل.',o:'مواجهات ثنائية متكافئة · 4 سباقات · راحة دقيقة واحدة.'} ],
+      [ {d:'انطلاق منخفض مع المحافظة على ميل الجذع أماماً في أول 10م دون انتصاب مبكر.',o:'ثنائيات (منفّذ وملاحظ) · 5 محاولات × 15م · تصحيح بعد كل محاولة.'},
+        {d:'الجري تحت حبل مشدود أو بين شواخص منخفضة لإجبار الجسم على الميل الأمامي.',o:'مسار 10م · 4 تكرارات · راحة 40 ثانية.'},
+        {d:'انتقال تدريجي من الميل إلى الاستقامة: 10م منحنياً ثم 15م منتصباً.',o:'أفواج ثلاثية · 4 تكرارات × 25م · ملاحظة الزميل.'} ],
+      [ {d:'الجري فوق علامات أرضية متساوية المسافات لضبط طول الخطوة وانتظامها.',o:'مسار 20م بعلامات كل 1.60م · 5 تكرارات · راحة 40 ثانية.'},
+        {d:'جري بخطوات سريعة قصيرة (تردد عالٍ) ثم خطوات واسعة، بالتناوب.',o:'أفواج · 4 تكرارات × 20م (10م تردد + 10م اتساع) · راحة 45 ثانية.'},
+        {d:'سلّم الرشاقة أو أطواق متتابعة بوضع قدم في كل خانة بأقصى سرعة.',o:'صفّان · 6 تكرارات لكل تلميذ · راحة 30 ثانية.'} ],
+      [ {d:'تأرجح الذراعين من الوقوف بزاوية 90° أماماً وخلفاً دون تحريك الجذع.',o:'الفوج في صفوف · 3 تكرارات × 20 ثانية · راحة 20 ثانية.'},
+        {d:'الجري داخل حارة ضيّقة محدّدة بشواخص مع إبقاء الذراعين على محور الجري.',o:'حارة بعرض 1م وطول 25م · 4 تكرارات · راحة 45 ثانية.'},
+        {d:'جري بالأمشاط مع تنسيق عكسي بين الذراع والرجل المقابلة.',o:'ثنائيات مع ملاحظة الزميل · 4 تكرارات × 20م.'} ],
+      [ {d:'الجري بأقصى سرعة وتجاوز خط النهاية بـ5م دون كبح أو تباطؤ.',o:'سباقات ثنائية · 4 تكرارات × 30م · راحة دقيقة.'},
+        {d:'دفع الصدر والكتفين أماماً في آخر خطوة قبل خط الوصول.',o:'ثنائيات متكافئة · 5 محاولات × 20م · تصحيح الوضعية.'},
+        {d:'سباق تنافسي كامل على 40م مع تطبيق كل مراحل السباق.',o:'أفواج رباعية · 3 سباقات · راحة دقيقتان · تسجيل الأزمنة.'} ]
+    ],
+    volley:[
+      [ {d:'إرسال سفلي من خلف خط النهاية مع قذف الكرة بارتفاع مناسب أمام اليد الضاربة.',o:'ثنائيات على جانبي الشبكة · 10 إرسالات لكل تلميذ · تبادل الأدوار.'},
+        {d:'إرسال موجّه نحو مناطق محدّدة بأطواق موضوعة في ملعب الخصم.',o:'3 أطواق في الزوايا والعمق · 12 محاولة · حساب الإصابات.'},
+        {d:'منافسة إرسال: كل إرسال ناجح يعبر الشبكة داخل الملعب يُحتسب نقطة للفريق.',o:'فريقان · جولتان × 10 إرسالات · إعلان النتيجة.'} ],
+      [ {d:'تمرير علوي ذاتي متواصل فوق الرأس بأطراف الأصابع (شكل الكأس) دون ملامسة الراحة.',o:'فردي · 3 تكرارات × 15 تمريرة · ارتفاع متر على الأقل.'},
+        {d:'تمرير علوي ثنائي متبادل مع التحرك للتمركز أسفل الكرة قبل كل لمسة.',o:'ثنائيات على بُعد 4م · 20 تمريرة متتالية · ثم زيادة المسافة.'},
+        {d:'تمرير علوي ثلاثي (استقبال ← إعداد ← تمرير) فوق الشبكة.',o:'أفواج ثلاثية · 6 دورات · تبديل المراكز بعد كل دورة.'} ],
+      [ {d:'ضمّ الساعدين وثني الركبتين لاستقبال كرة ممررة باليد وتوجيهها للأعلى.',o:'ثنائيات (قاذف ومستقبل) · 15 استقبالاً · تبادل الأدوار.'},
+        {d:'استقبال إرسال سفلي بالساعدين وتوجيه الكرة نحو منطقة الإعداد.',o:'ثلاثيات (مرسِل · مستقبِل · معدّ) · 12 محاولة · تبديل المراكز.'},
+        {d:'تمرير سفلي ثنائي متواصل مع التحرك الجانبي لملاحقة الكرة.',o:'ثنائيات على بُعد 5م · 20 تمريرة · دون إسقاط.'} ],
+      [ {d:'ضرب الكرة الثابتة (ممسوكة أو معلّقة) فوق الشبكة باليد المفتوحة الممدودة.',o:'صفوف أمام الشبكة · 10 محاولات لكل تلميذ.'},
+        {d:'تنسيق خطوات الاقتراب الثلاث مع الارتقاء دون كرة ثم مع كرة ممررة.',o:'ثنائيات (معدّ وساحق) · 10 محاولات · تبديل الأدوار.'},
+        {d:'سحق كرة معدّة من الزميل مع توجيهها نحو مساحة فارغة في ملعب الخصم.',o:'ثلاثيات · 12 محاولة · حساب الكرات الناجحة.'} ],
+      [ {d:'التحرك السريع في وضعية دفاعية منخفضة لاستقبال كرات موجّهة لمناطق مختلفة.',o:'الأستاذ أو الزميل يوجّه الكرات · 12 كرة لكل تلميذ.'},
+        {d:'تطبيق الدوران القانوني مع كل استرجاع للإرسال والتموقع الصحيح.',o:'فريقان × 6 لاعبين · 10 دورات · تصحيح المراكز.'},
+        {d:'لعب مصغّر 4 ضد 4 مع اشتراط ثلاث لمسات قبل ردّ الكرة.',o:'ملعب مصغّر · شوطان × 5 دقائق · تبديل بين الشوطين.'} ]
+    ]
+  },
+  gear:{
+    sprint:'مضمار أو ساحة مستوية، مكعّبات انطلاق، صافرة، شواخص، ساعة توقيت.',
+    volley:'ملعب بشبكة نظامية، كرات طائرة، شواخص، أطواق، صافرة.',
+    _warm:'ساحة مستوية وآمنة، صافرة، شواخص.',
+    _cool:'فضاء هادئ، حصائر عند الحاجة.'
+  }
+};
+let drillEdits={};   // تعديلاتك على التمارين: "sportId|phase|critIdx|n" -> {d,o}
 const SPORTS={
   team:[
     {id:'hand',name:'كرة اليد',icon:I.hand,
@@ -2082,10 +2197,18 @@ function lessonData(k,classId){
     act2Subs:[r.t]};
 }
 function actCell(name,target,subs){
+  // كل سطر هدف مستقل، ويُعرض مرقّماً 1. 2. 3.
+  const items=[];
+  (subs||[]).forEach(function(x){
+    String(x||'').split('\n').forEach(function(l){
+      const t=l.replace(/^\s*[\d.\-•●]+\s*/,'').trim();
+      if(t)items.push(t);
+    });
+  });
   return `<div class="act-k"><b>اسم النشاط:</b> ${esc(name)}</div>
     <div class="act-k"><b>الهدف الخاص:</b> ${esc(target)}</div>
     <div class="act-k"><b>الأهداف الإجرائية:</b></div>
-    <ul class="act-subs">${subs.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`;
+    <ol class="act-subs">${items.map(x=>`<li>${esc(x)}</li>`).join('')}</ol>`;
 }
 function renderJournal(){
   const val=document.getElementById('jDate').value;
@@ -2179,6 +2302,39 @@ function lpFillClass(){
   sel.innerHTML=opts.length?opts.map(c=>`<option value="${c.id}">${c.name}</option>`).join(''):'<option value="">— لا قسم —</option>';
   renderLesson();
 }
+// ===== ربط التمارين بالهدف والمرحلة =====
+function _sportBy(name){return SPORTS.indiv.concat(SPORTS.team).find(s=>s.name===name)||null;}
+function drillKey(sid,phase,ci,n){return sid+'|'+phase+'|'+ci+'|'+n;}
+function drillsFor(sportName,objText,phase){
+  const sp=_sportBy(sportName); const sid=sp?sp.id:'';
+  let base=null, ci=0;
+  if(phase==='warm') base=(DRILLS.warm[sid]||null);
+  else if(phase==='cool'){ base=DRILLS.cool; }
+  else {
+    const set=DRILLS.main[sid]; if(!set)return null;
+    const i=sp.goals.indexOf(objText); ci=(i>=0?i:0);
+    base=set[ci]||null;
+  }
+  if(!base)return null;
+  // طبّق تعديلاتك المحفوظة
+  return base.map(function(x,n){
+    const ov=drillEdits[drillKey(sid,phase,ci,n)];
+    return ov?{d:ov.d,o:ov.o}:{d:x.d,o:x.o};
+  });
+}
+function drillsHtml(list){
+  if(!list||!list.length)return '';
+  return list.map(function(x,i){
+    return '<div class="dr"><span class="dr-n">'+(i+1)+'</span>'+esc(x.d)+
+           '<div class="dr-o">التنظيم: '+esc(x.o)+'</div></div>';
+  }).join('');
+}
+function gearFor(sportName,phase){
+  const sp=_sportBy(sportName); const sid=sp?sp.id:'';
+  if(phase==='warm')return DRILLS.gear._warm;
+  if(phase==='cool')return DRILLS.gear._cool;
+  return DRILLS.gear[sid]||'';
+}
 function renderLesson(forceFresh){
   if(!forceFresh){const saved=lessonsSaved[lessonKey()];
     if(saved){document.getElementById('lessonBody').innerHTML='<div class="gwrap"><div class="lpdoc" id="lessonDoc">'+saved+'</div></div>';return;}}
@@ -2208,27 +2364,27 @@ function renderLesson(forceFresh){
      </tr></thead><tbody>
        <tr><td class="ph">الجزء التحضيري</td>
          <td ${E}>تهيئة الجسم بدنياً ونفسياً للمجهود.</td>
-         <td ${E}>إحماء عام (جري خفيف، تنشيط المفاصل) ثم إحماء خاص موجّه نحو متطلبات النشاط.</td>
+         <td ${E}>${drillsHtml(drillsFor(indivSport,'','warm'))||'إحماء عام (جري خفيف، تنشيط المفاصل) ثم إحماء خاص موجّه نحو متطلبات النشاط.'}</td>
          <td class="dur" ${E}>15 د</td>
-         <td ${E}>الساحة، صافرة، شواخص.</td>
+         <td ${E}>${esc(gearFor(indivSport,'warm'))}</td>
          <td ${E}>استجابة التلاميذ وارتفاع وتيرة النشاط تدريجياً.</td></tr>
        <tr><td class="ph">الجزء الرئيسي<br><small>نشاط فردي (${esc(indivSport)})</small></td>
          <td ${E}>${esc(indivObj)}</td>
-         <td ${E}>وضعيات وتمارين تطبيقية متدرّجة حول الهدف مع توجيهات تقنية وتصحيح فردي.</td>
+         <td ${E}>${drillsHtml(drillsFor(indivSport,indivObj,'main'))||'وضعيات وتمارين تطبيقية متدرّجة حول الهدف مع توجيهات تقنية وتصحيح فردي.'}</td>
          <td class="dur" ${E}>40 د</td>
-         <td ${E}>عتاد النشاط الفردي، مسارات، شريط قياس.</td>
+         <td ${E}>${esc(gearFor(indivSport,'main'))||'عتاد النشاط الفردي، مسارات، شريط قياس.'}</td>
          <td ${E}>أداء الحركة وفق المؤشرات التقنية المطلوبة.</td></tr>
        <tr><td class="ph">الجزء الرئيسي<br><small>نشاط جماعي (${esc(teamSport)})</small></td>
          <td ${E}>${esc(teamObj)}</td>
-         <td ${E}>وضعيات لعب وتمارين تكتيكية مصغّرة ثم لعب جماعي مع تطبيق القواعد.</td>
+         <td ${E}>${drillsHtml(drillsFor(teamSport,teamObj,'main'))||'وضعيات لعب وتمارين تكتيكية مصغّرة ثم لعب جماعي مع تطبيق القواعد.'}</td>
          <td class="dur" ${E}>40 د</td>
-         <td ${E}>كرات، أهداف/شباك، ميدان مقسّم.</td>
+         <td ${E}>${esc(gearFor(teamSport,'main'))||'كرات، أهداف/شباك، ميدان مقسّم.'}</td>
          <td ${E}>التموقع الصحيح وفعالية التنفيذ في وضعية اللعب.</td></tr>
        <tr><td class="ph">الجزء الختامي</td>
          <td ${E}>الرجوع بالجسم للحالة الطبيعية وتقويم الحصة.</td>
-         <td ${E}>تمارين استرخاء وتمطّط، ومراجعة جماعية لأهم النقاط المكتسبة.</td>
+         <td ${E}>${drillsHtml(drillsFor(indivSport,'','cool'))||'تمارين استرخاء وتمطّط، ومراجعة جماعية لأهم النقاط المكتسبة.'}</td>
          <td class="dur" ${E}>05 د</td>
-         <td ${E}>فضاء هادئ.</td>
+         <td ${E}>${esc(gearFor(indivSport,'cool'))}</td>
          <td ${E}>عودة المؤشرات الفيزيولوجية وتفاعل التلاميذ مع التقويم.</td></tr>
      </tbody></table>
    </div></div>`;
@@ -2256,6 +2412,92 @@ function exec(cmd,val){
   try{document.execCommand(cmd,false,val||null);}catch(e){}
 }
 function fontStep(dir){rtSize=Math.min(7,Math.max(1,rtSize+dir));try{document.execCommand('fontSize',false,rtSize);}catch(e){}}
+// لصق كنص عادي (يمنع إفساد التنسيق عند النسخ من مكان آخر)
+function pastePlain(){
+  const t=prompt('الصق النص هنا (سيُدرج بلا تنسيق):');
+  if(t==null||!t.trim())return;
+  try{document.execCommand('insertText',false,t);}catch(e){}
+}
+// إظهار الحالة النشطة (غامق/مائل/تسطير)
+document.addEventListener('selectionchange',function(){
+  try{
+    const m={rtB:'bold',rtI:'italic',rtU:'underline',rtS:'strikeThrough'};
+    Object.keys(m).forEach(function(id){
+      const el=document.getElementById(id); if(!el)return;
+      el.classList.toggle('on',document.queryCommandState(m[id]));
+    });
+  }catch(e){}
+});
+// ===== نافذة مكتبة التمارين =====
+const DR_PHASE=['warm','main','main','cool'];
+function _lessonSports(){
+  const k=(+document.getElementById('lSession').value)-1;
+  return {
+    indivSport:unitPlan?unitPlan.indivSport:'', teamSport:unitPlan?unitPlan.teamSport:'',
+    indivObj:unitPlan?unitPlan.rows[k].i:'', teamObj:unitPlan?unitPlan.rows[k].t:''
+  };
+}
+function _drCtx(){
+  const row=+document.getElementById('drPhase').value, ph=DR_PHASE[row], s=_lessonSports();
+  const sport=(row===2)?s.teamSport:s.indivSport;
+  const obj=(row===2)?s.teamObj:(row===1?s.indivObj:'');
+  const sp=_sportBy(sport); const sid=sp?sp.id:'';
+  let ci=0; if(ph==='main'&&sp){const i=sp.goals.indexOf(obj);ci=(i>=0?i:0);}
+  return {row:row,ph:ph,sport:sport,obj:obj,sid:sid,ci:ci,list:drillsFor(sport,obj,ph)};
+}
+function openDrills(){document.getElementById('drOv').classList.add('show');renderDrills();}
+function closeDrills(){document.getElementById('drOv').classList.remove('show');}
+function renderDrills(){
+  const c=_drCtx(), box=document.getElementById('drList'), info=document.getElementById('drInfo');
+  if(!c.list){
+    info.style.display='block';
+    info.innerHTML='لا توجد تمارين جاهزة لنشاط <b>'+esc(c.sport||'—')+'</b> بعد. المكتبة تغطي حالياً: الجري السريع وكرة الطائرة.';
+    box.innerHTML=''; return;
+  }
+  info.style.display='block';
+  info.innerHTML='<b>'+esc(c.sport)+'</b>'+(c.ph==='main'?' · المعيار: '+esc((_sportBy(c.sport).crit[c.ci]||'')):'')+
+                 '<br>عدّل أي تمرين ثم احفظه — يبقى محفوظاً في كل مذكراتك القادمة.';
+  box.innerHTML=c.list.map(function(x,n){
+    return '<div class="cm-warn" style="background:var(--card);color:inherit">'+
+      '<div style="font-weight:800;color:var(--navy);margin-bottom:5px">التمرين '+(n+1)+'</div>'+
+      '<textarea id="drD'+n+'" rows="2" style="width:100%;font-size:12px">'+esc(x.d)+'</textarea>'+
+      '<textarea id="drO'+n+'" rows="2" style="width:100%;font-size:12px;margin-top:5px">'+esc(x.o)+'</textarea>'+
+      '<div style="display:flex;gap:6px;margin-top:6px">'+
+        '<button class="th-b pdf" style="flex:1" onclick="saveDrill('+n+')">حفظ التعديل</button>'+
+        '<button class="th-b" style="flex:1;background:var(--mint-soft);color:var(--mint-d)" onclick="insertDrill('+n+')">إدراج هذا</button>'+
+      '</div></div>';
+  }).join('');
+}
+function saveDrill(n){
+  const c=_drCtx(); if(!c.list)return;
+  const d=document.getElementById('drD'+n).value.trim(), o=document.getElementById('drO'+n).value.trim();
+  if(!d){toast('⚠️ وصف التمرين فارغ');return;}
+  drillEdits[drillKey(c.sid,c.ph,c.ci,n)]={d:d,o:o};
+  try{localStorage.setItem('delbaz_eps_drills',JSON.stringify(drillEdits));}catch(e){}
+  toast('✓ حُفظ التمرين '+(n+1));
+}
+function _drCell(row){
+  const doc=document.getElementById('lessonDoc'); if(!doc)return null;
+  const tr=doc.querySelectorAll('.lpm tbody tr')[row]; if(!tr)return null;
+  return tr.querySelectorAll('td')[2]||null;   // عمود وضعيات التعلم
+}
+function insertDrill(n){
+  const c=_drCtx(); if(!c.list)return;
+  const cell=_drCell(c.row); if(!cell){toast('⚠️ افتح المذكرة أولاً');return;}
+  const d=document.getElementById('drD'+n).value.trim(), o=document.getElementById('drO'+n).value.trim();
+  cell.innerHTML+=drillsHtml([{d:d,o:o}]);
+  toast('✓ أُدرج التمرين '+(n+1));
+}
+function insertAllDrills(){
+  const c=_drCtx(); if(!c.list){toast('⚠️ لا تمارين لهذا النشاط');return;}
+  const cell=_drCell(c.row); if(!cell){toast('⚠️ افتح المذكرة أولاً');return;}
+  const list=c.list.map(function(x,n){
+    const dEl=document.getElementById('drD'+n), oEl=document.getElementById('drO'+n);
+    return {d:dEl?dEl.value.trim():x.d, o:oEl?oEl.value.trim():x.o};
+  });
+  cell.innerHTML=drillsHtml(list);
+  closeDrills(); toast('✓ أُدرجت التمارين الثلاثة');
+}
 
 // ===== DIAGNOSTIC OBSERVATION SHEET PDF (landscape) =====
 function exportPdfDiag(){
@@ -2522,7 +2764,7 @@ th{background:#14375f;color:#fff;font-family:'Cairo';font-weight:700;padding:4px
 td{border:1px solid #aab4c0;padding:3px 5px!important;vertical-align:top;line-height:1.4;word-wrap:break-word}
 td.c{text-align:center}td.b{font-family:'Cairo';font-weight:700}
 .act-k b{font-family:'Cairo';color:#0fa882}.act-subs{list-style:none;margin:2px 0 0;padding-right:10px}
-.act-subs li{position:relative;padding-right:9px;margin-bottom:2px}.act-subs li::before{content:"•";position:absolute;right:0}
+.act-subs{counter-reset:acts}.act-subs li{position:relative;padding-right:12px;margin-bottom:2px;counter-increment:acts}.act-subs li::before{content:counter(acts) ".";position:absolute;right:0;font-weight:700}
 .sign{display:flex;gap:8px;margin-top:14px;page-break-inside:avoid}
 .sign .col{flex:1;text-align:center;border:1px dashed #8895a3;border-radius:5px;padding:5px 4px}
 .sign .col .t{font-family:'Cairo';font-weight:800;font-size:9px;color:#0c2138;margin-bottom:3px}
@@ -2618,7 +2860,7 @@ const firebaseConfig={
   messagingSenderId:"999797512825",
   appId:"1:999797512825:web:33de4012e8b0e2952ed2a8"
 };
-const SYNC_KEYS=['delbaz_eps_settings','delbaz_eps_classes','delbaz_eps_schedule','delbaz_eps_marks','delbaz_eps_crit','delbaz_eps_unit','delbaz_eps_lessons','delbaz_eps_terms','delbaz_eps_dailylogs','delbaz_eps_lessoninfo'];
+const SYNC_KEYS=['delbaz_eps_settings','delbaz_eps_classes','delbaz_eps_schedule','delbaz_eps_marks','delbaz_eps_crit','delbaz_eps_unit','delbaz_eps_lessons','delbaz_eps_terms','delbaz_eps_dailylogs','delbaz_eps_lessoninfo','delbaz_eps_drills'];
 
 // ===================== بحث عن تلميذ (3ب) =====================
 function _allSports(){return SPORTS.team.concat(SPORTS.indiv);}
@@ -2807,7 +3049,7 @@ function cloudPull(){
 }
 try{cloudInit();}catch(e){}
 
-loadSettings();loadClasses();loadSchedule();try{const u=localStorage.getItem('delbaz_eps_unit');if(u)unitPlan=JSON.parse(u);}catch(e){}try{const mk=localStorage.getItem('delbaz_eps_marks');if(mk)diagMarks=JSON.parse(mk);}catch(e){}try{const cc=localStorage.getItem('delbaz_eps_crit');if(cc)customCrit=JSON.parse(cc);}catch(e){}try{const ls=localStorage.getItem('delbaz_eps_lessons');if(ls)lessonsSaved=JSON.parse(ls);}catch(e){}try{const li=localStorage.getItem('delbaz_eps_lessoninfo');if(li)lessonInfo=JSON.parse(li);}catch(e){}try{const ts=localStorage.getItem('delbaz_eps_terms');if(ts)termSports=JSON.parse(ts);}catch(e){}try{const jn=localStorage.getItem('delbaz_eps_dailylogs');if(jn)dailyLogs=JSON.parse(jn);}catch(e){}cur=SPORTS.team.find(s=>s.id===termRec().team)||SPORTS.team[0];renderSubs();renderTermPick();render();initTab2();
+loadSettings();loadClasses();loadSchedule();try{const u=localStorage.getItem('delbaz_eps_unit');if(u)unitPlan=JSON.parse(u);}catch(e){}try{const mk=localStorage.getItem('delbaz_eps_marks');if(mk)diagMarks=JSON.parse(mk);}catch(e){}try{const cc=localStorage.getItem('delbaz_eps_crit');if(cc)customCrit=JSON.parse(cc);}catch(e){}try{const ls=localStorage.getItem('delbaz_eps_lessons');if(ls)lessonsSaved=JSON.parse(ls);}catch(e){}try{const li=localStorage.getItem('delbaz_eps_lessoninfo');if(li)lessonInfo=JSON.parse(li);}catch(e){}try{const ts=localStorage.getItem('delbaz_eps_terms');if(ts)termSports=JSON.parse(ts);}catch(e){}try{const dr=localStorage.getItem('delbaz_eps_drills');if(dr)drillEdits=JSON.parse(dr);}catch(e){}try{const jn=localStorage.getItem('delbaz_eps_dailylogs');if(jn)dailyLogs=JSON.parse(jn);}catch(e){}cur=SPORTS.team.find(s=>s.id===termRec().team)||SPORTS.team[0];renderSubs();renderTermPick();render();initTab2();
 setTimeout(showUpdate,800);
 window.addEventListener('load',function(){setTimeout(showUpdate,1400);});
 // تذكير لطيف بالنسخة الاحتياطية (إن مضى أكثر من 14 يوماً وهناك بيانات فعلية)
