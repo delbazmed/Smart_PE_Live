@@ -432,6 +432,28 @@ body.dark .qr-link{background:#10202c}
 .cnd:last-child{margin-bottom:0}
 .cnd-n{position:absolute;right:0;top:2px;width:11px;height:11px;border-radius:3px;background:#c9d4e0;
   color:#20364e;font-size:8px;font-weight:800;display:flex;align-items:center;justify-content:center}
+/* التوزيع السنوي */
+#ypDoc{min-width:920px}
+.yp{width:100%;border-collapse:collapse;table-layout:fixed;margin-top:6px}
+.yp th{background:var(--navy);color:#fff;font-family:var(--fh);font-weight:700;font-size:10px;padding:6px 3px;border:1px solid var(--navy);text-align:center;line-height:1.3}
+.yp td{border:1px solid var(--line);padding:5px 4px;font-size:11px;text-align:center;vertical-align:middle}
+.yp td[contenteditable]:focus{background:#fffbe9;outline:none}
+.yp .yp-mon{background:#eef2f7;font-family:var(--fh);font-weight:800;color:var(--navy)}
+.yp .yp-dt{font-size:10.5px;white-space:nowrap}
+.yp .yp-n{font-family:var(--fh);font-weight:700;background:#f7f9fc}
+.yp .yp-hol{font-size:10px;color:#9c2626;font-weight:700}
+.yp .yp-brk{font-family:var(--fh);font-weight:900;font-size:15px;color:var(--navy);background:#eef2f7;padding:10px}
+.yp .yp-fld{background:#f3f6fa;padding:2px}
+.yp .yp-fld span{writing-mode:vertical-rl;transform:rotate(180deg);display:inline-block;white-space:nowrap;
+  font-family:var(--fh);font-weight:900;color:#9c2626;font-size:13px;letter-spacing:.5px}
+.yp .k-ev{background:#fde8e8;font-weight:700}
+.yp .k-dg{background:#e8f0fb;font-weight:700}
+.yp .k-ig{background:#fff4e0;font-weight:700}
+.yp .k-pr{background:#eaf7f2;font-weight:700}
+body.dark .yp td{border-color:#1d3346}
+body.dark .yp .yp-mon,body.dark .yp .yp-n,body.dark .yp .yp-brk,body.dark .yp .yp-fld{background:#102030;color:#dce6f0}
+body.dark .yp .k-ev{background:#3a1f1f}body.dark .yp .k-dg{background:#15263c}
+body.dark .yp .k-ig{background:#3a2e14}body.dark .yp .k-pr{background:#12302a}
 .rt-b.on{background:var(--mint);color:#08281f}
 .rt-sel{max-width:92px}
 .rt-b{min-width:32px;height:32px;border:none;border-radius:8px;background:rgba(255,255,255,.12);color:#fff;font-family:var(--fh);font-weight:700;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:1}
@@ -508,12 +530,13 @@ body.dark .qr-link{background:#10202c}
     <div class="sub">السند الرقمي لأستاذ التربية البدنية والرياضية — التعليم الثانوي</div>
   </header>
   <nav>
-    <button class="tab on" onclick="switchTab(0,this)">التقويم التشخيصي</button>
-    <button class="tab" onclick="switchTab(1,this)">بناء الوحدة التعلمية</button>
-    <button class="tab" onclick="switchTab(2,this)">الدفتر اليومي</button>
-    <button class="tab" onclick="switchTab(3,this)">المذكرة التربوية</button>
-    <button class="tab" onclick="switchTab(4,this)">النظري</button>
-    <button class="tab" onclick="switchTab(5,this)">الإعدادات</button>
+    <button class="tab on" data-i="0" onclick="switchTab(0,this)">التقويم التشخيصي</button>
+    <button class="tab" data-i="6" onclick="switchTab(6,this)">التوزيع السنوي</button>
+    <button class="tab" data-i="1" onclick="switchTab(1,this)">بناء الوحدة التعلمية</button>
+    <button class="tab" data-i="2" onclick="switchTab(2,this)">الدفتر اليومي</button>
+    <button class="tab" data-i="3" onclick="switchTab(3,this)">المذكرة التربوية</button>
+    <button class="tab" data-i="4" onclick="switchTab(4,this)">النظري</button>
+    <button class="tab" data-i="5" onclick="switchTab(5,this)">الإعدادات</button>
   </nav>
 
   <!-- ============ TAB 1 ============ -->
@@ -582,6 +605,31 @@ body.dark .qr-link{background:#10202c}
   </div>
 
   <!-- ============ TAB 2 ============ -->
+  <div class="sec pane" id="tab7">
+    <div class="block">
+      <div class="block-h"><svg viewBox="0 0 24 24"><path d="M3 4h18v18H3zM3 10h18M8 2v4M16 2v4"/></svg>التوزيع السنوي للحصص والأنشطة</div>
+      <div class="settings-note">النموذج الرسمي للموسم — كل خانة قابلة للتعديل مباشرة. الترويسة والإمضاءات تُؤخذ من الإعدادات.</div>
+    </div>
+    <div id="ypBody"></div>
+    <div class="btn-row no-print">
+      <button class="btn gen" onclick="saveYearPlan()">
+        <svg viewBox="0 0 24 24" stroke="currentColor"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+        حفظ التعديلات
+      </button>
+      <button class="btn exp" onclick="resetYearPlan()">
+        <svg viewBox="0 0 24 24" stroke="currentColor"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/></svg>
+        استرجاع النموذج
+      </button>
+      <button class="btn exp" onclick="previewYear()">
+        <svg viewBox="0 0 24 24" stroke="currentColor"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        نافذة القراءة فقط
+      </button>
+    </div>
+    <button class="btn pdf no-print" onclick="exportPdfYear()">
+      <svg viewBox="0 0 24 24" stroke="currentColor"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z"/></svg>
+      تصدير وطباعة التوزيع السنوي PDF
+    </button>
+  </div>
   <div class="sec pane" id="tab2">
     <div class="block">
       <div class="block-h"><svg viewBox="0 0 24 24"><path d="M12 2 2 7l10 5 10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>رأس الوحدة التعلمية</div>
@@ -1000,6 +1048,13 @@ let students=["أحمد","عمر","سارة","فاطمة","يوسف","ليلى",
 // ===== إصدار التطبيق وسجل التحديثات =====
 const APP_VERSION='3.3';
 const CHANGELOG=[
+  {v:'الإصدار 3.3', items:[
+    'تبويب جديد: التوزيع السنوي للحصص والأنشطة — النموذج الرسمي كاملاً، كل خانة قابلة للتعديل، بالترويسة والإمضاءات وتصدير PDF.',
+    'مكتبة التمارين اكتملت: 198 تمريناً تغطي الأنشطة السبعة في المستويات الثلاثة.',
+    'الوثب الثلاثي أُضيف نشاطاً فردياً بمعاييره وأهدافه الرسمية.',
+    'التمارين تُجلب الآن حسب رقم المعيار والمستوى، فتعديل نص المعيار لم يعد يغيّرها.',
+    'كل تمرين بثلاثة حقول: الوصف · شرح موجز · التنظيم — الأولان في وضعيات التعلم والثالث في ظروف الإنجاز.'
+  ]},
   {v:'الإصدار 3.2', items:[
     'مكتبة التمارين: 3 تمارين جاهزة لكل هدف — الجري السريع وكرة الطائرة (المرحلة 1).',
     'وضعيات التعلم صارت شرح التمارين مفصّلاً، وظروف الإنجاز للعتاد والتنظيم.',
@@ -1038,6 +1093,7 @@ const GUIDE_STEPS=[
   ['التقويم التشخيصي','اختر الفصل ثم النشاط الجماعي والفردي، وسجّل أداء كل تلميذ (0/1) في بطاقة الملاحظة. يمكنك تعديل نص أي معيار وسيتزامن في كل التبويبات.'],
   ['بحث عن تلميذ','في أعلى التقويم التشخيصي، اكتب اسم التلميذ لعرض قسمه ونتائجه (المعايير المتحكَّم فيها والناقصة) بسرعة.'],
   ['استخراج المعايير','اضغط «حفظ واستخراج معايير الوحدة للنشاطين» ليُولَّد تقرير النقائص والأهداف الخاصة للنشاطين.'],
+  ['التوزيع السنوي','تبويب «التوزيع السنوي» فيه النموذج الرسمي للحصص والأنشطة عبر أشهر الموسم: نوع كل حصة، العطل والمناسبات، والميادين الثلاثة. عدّل أي خانة مباشرة، احفظ، ثم صدّره PDF بترويستك وإمضاءاتك.'],
   ['بناء الوحدة التعلمية','انتقل لتبويب «بناء الوحدة» واضغط توليد، فتُبنى 8 حصص آلياً بالأهداف المستخرجة، مع تصدير Excel وPDF.'],
   ['المذكرة التربوية','اختر القسم ورقم الحصة، حرّر المذكرة بأدوات التنسيق، ثم «حفظ التعديلات». تُصدَّر PDF أفقية وتُسجَّل أهدافها في الدفتر اليومي.'],
   ['الدفتر اليومي والرزنامة','في أعلى الدفتر: شريط «الحصة القادمة» وجدولك الأسبوعي المرئي. والدفتر يُولَّد آلياً حسب جدولك ويُحفظ بالتاريخ ويُسترجع من الأرشيف.'],
@@ -1827,7 +1883,8 @@ function save(silent){
 function switchTab(idx,btn){
   const tabs=document.querySelectorAll('.tab');
   tabs.forEach(t=>t.classList.remove('on'));
-  (btn||tabs[idx]).classList.add('on');
+  const tgt=btn||document.querySelector('.tab[data-i="'+idx+'"]')||tabs[idx];
+  if(tgt)tgt.classList.add('on');
   document.querySelectorAll('.pane').forEach(p=>p.classList.remove('on'));
   document.getElementById('tab'+(idx+1)).classList.add('on');
   document.getElementById('fab').style.display=idx===0?'flex':'none';
@@ -1835,6 +1892,7 @@ function switchTab(idx,btn){
   if(idx===2)initJournal();
   if(idx===3){lpFillClass();renderLesson();}
   if(idx===4)renderTheory();
+  if(idx===6)renderYearPlan();
   if(idx===5){const av=document.getElementById('aboutVer');if(av)av.textContent='الإصدار '+APP_VERSION;}
   window.scrollTo({top:0});
 }
@@ -2664,6 +2722,151 @@ function lpFillClass(){
   sel.innerHTML=opts.length?opts.map(c=>`<option value="${c.id}">${c.name}</option>`).join(''):'<option value="">— لا قسم —</option>';
   renderLesson();
 }
+// ===== التوزيع السنوي للحصص والأنشطة =====
+let yearPlanSaved='';   // HTML محفوظ بعد تعديلاتك
+const YP_COLS=['نوع الحصة — المستوى الأولى','نوع الحصة — الثانية + الثالثة','نوع الحصة — الرابعة + الخامسة'];
+const YP_ROWS=[
+ {mon:'سبتمبر',ms:2, dt:'21 الى 24/09/2026', n:'',   span3:'تنظيم واتصال', fld:'الوضعيات والانتقالات',fs:13},
+ {dt:'27 الى 01/10/2026', n:'01', c1:'أنشطة تحضيرية',c1s:2, c2:'أنشطة تحضيرية', c3:'أنشطة تحضيرية'},
+ {mon:'اكتوبر',ms:4, dt:'04 الى 08/10/2026', n:'02', skip1:1, c2:'تقويم تشخيصي', c3:'تقويم تشخيصي'},
+ {dt:'11 الى 15/10/2026', n:'03', c1:'تعليمية 02/01', c2:'تعليمية 02/01', c3:'تعليمية 01'},
+ {dt:'18 الى 22/10/2026', n:'04', c1:'تعليمية 04/03', c2:'تعليمية 04/03', c3:'تعليمية 02'},
+ {dt:'25 الى 29/10/2026', n:'05', c1:'تعليمية ادماجية', c2:'تعليمية ادماجية', c3:'تعليمية 03', hol:'عطلة الخريف'},
+ {mon:'نوفمبر',ms:4, dt:'01 الى 05/11/2026', n:'07', c1:'تعليمية 06/05', c2:'تعليمية 06/05', c3:'ادماجية 01'},
+ {dt:'08 الى 12/11/2026', n:'08', c1:'تعليمية 08/07', c2:'تعليمية 08/07', c3:'تعليمية 04'},
+ {dt:'15 الى 19/11/2026', n:'09', c1:'تعليمية ادماجية', c2:'تعليمية ادماجية', c3:'تعليمية 05'},
+ {dt:'22 الى 26/11/2026', n:'10', c1:'تعليمية 10/09', c2:'تعليمية 10/09', c3:'تعليمية 06'},
+ {mon:'ديسمبر',ms:3, dt:'29 الى 03/12/2026', n:'11', c1:'تعليمية 12/11', c2:'تعليمية 12/11', c3:'ادماجية 02'},
+ {dt:'06 الى 10/12/2026', n:'12', c1:'تقويم تحصيلي', c2:'تقويم تحصيلي', c3:'تقويم تحصيلي', hol:'اختبارات الفصل الأول'},
+ {dt:'13 الى 17/12/2026', n:'13', c1:'تقويم تشخيصي', c2:'تقويم تشخيصي', c3:'تقويم تشخيصي'},
+ {mon:'',ms:1, dt:'17 الى 03/01/2027', brk:'عطلة الشتاء', fld:'الحركات القاعدية',fs:12},
+ {mon:'جانفي',ms:4, dt:'03 الى 07/01/2027', n:'14', c1:'تعليمية 02/01', c2:'تعليمية 02/01', c3:'تعليمية 01'},
+ {dt:'10 الى 14/01/2027', n:'15', c1:'تعليمية 04/03', c2:'تعليمية 04/03', c3:'تعليمية 02', hol:'رأس السنة الأمازيغية'},
+ {dt:'17 الى 21/01/2027', n:'16', c1:'تعليمية ادماجية', c2:'تعليمية ادماجية', c3:'تعليمية 03'},
+ {dt:'24 الى 28/01/2027', n:'17', c1:'تعليمية 06/05', c2:'تعليمية 06/05', c3:'ادماجية 01'},
+ {mon:'فيفري',ms:4, dt:'31 الى 04/02/2027', n:'18', c1:'تعليمية 08/07', c2:'تعليمية 08/07', c3:'تعليمية 04'},
+ {dt:'07 الى 11/02/2027', n:'19', c1:'تعليمية ادماجية', c2:'تعليمية ادماجية', c3:'تعليمية 05'},
+ {dt:'14 الى 18/02/2027', n:'20', c1:'تعليمية 10/09', c2:'تعليمية 10/09', c3:'ادماجية 02'},
+ {dt:'21 الى 25/02/2027', n:'21', c1:'تقويم تحصيلي', c2:'تقويم تحصيلي', c3:'تقويم تحصيلي'},
+ {mon:'مارس',ms:3, dt:'28 الى 04/03/2027', n:'22', c1:'تقويم تشخيصي', c2:'تقويم تشخيصي', c3:'تقويم تشخيصي', hol:'اختبارات الفصل الثاني'},
+ {dt:'07 الى 11/03/2027', n:'23', c1:'تعليمية 02/01', c2:'تعليمية 02/01', c3:'تعليمية 01'},
+ {dt:'14 الى 18/03/2027', n:'24', c1:'تعليمية 04/03', c2:'تعليمية 04/03', c3:'تعليمية 02'},
+ {mon:'',ms:1, dt:'18 الى 04/04/2027', brk:'عطلة الربيع', fld:'الهيكلة والبناء',fs:9},
+ {mon:'افريل',ms:4, dt:'04 الى 08/04/2027', n:'25', c1:'تعليمية ادماجية', c2:'تعليمية ادماجية', c3:'تعليمية 03'},
+ {dt:'11 الى 15/04/2027', n:'26', c1:'تعليمية 06/05', c2:'تعليمية 06/05', c3:'ادماجية 01'},
+ {dt:'18 الى 22/04/2027', n:'27', c1:'تعليمية 08/07', c2:'تعليمية 08/07', c3:'تعليمية 04'},
+ {dt:'25 الى 29/04/2027', n:'28', c1:'تعليمية ادماجية', c2:'تعليمية ادماجية', c3:'تعليمية 05'},
+ {mon:'ماي',ms:4, dt:'02 الى 06/05/2027', n:'29', c1:'تعليمية 10/09', c2:'تعليمية 10/09', c3:'ادماجية 02'},
+ {dt:'09 الى 13/05/2027', n:'30', c1:'تقويم تحصيلي', c2:'تقويم تحصيلي', c3:'تقويم تحصيلي'},
+ {dt:'16 الى 20/05/2027', n:'31', c1:'', c2:'', c3:''},
+ {dt:'23 الى 27/05/2027', n:'32', c1:'', c2:'', c3:'', hol:'اختبارات الفصل الثالث'}
+];
+function persistYearPlan(){try{localStorage.setItem('delbaz_eps_yearplan',yearPlanSaved);}catch(e){}}
+function ypKind(t){
+  t=String(t||'');
+  if(t.indexOf('تحصيلي')>=0||t.indexOf('اختبار')>=0)return 'k-ev';
+  if(t.indexOf('تشخيصي')>=0)return 'k-dg';
+  if(t.indexOf('ادماج')>=0)return 'k-ig';
+  if(t.indexOf('تحضيرية')>=0||t.indexOf('تنظيم')>=0)return 'k-pr';
+  return '';
+}
+function renderYearPlan(forceFresh){
+  const host=document.getElementById('ypBody'); if(!host)return;
+  if(!forceFresh && yearPlanSaved){host.innerHTML='<div class="gwrap"><div class="lpdoc" id="ypDoc">'+yearPlanSaved+'</div></div>';return;}
+  const E='contenteditable="true" class="editor-cell"';
+  let rows='';
+  YP_ROWS.forEach(function(r){
+    let tr='<tr>';
+    if(r.mon!=null) tr+='<td class="yp-mon" rowspan="'+(r.ms||1)+'" '+E+'>'+esc(r.mon)+'</td>';
+    tr+='<td class="yp-dt" '+E+'>'+esc(r.dt)+'</td>';
+    if(r.brk){
+      tr+='<td class="yp-brk" colspan="4" '+E+'>'+esc(r.brk)+'</td>';
+    }else if(r.span3){
+      tr+='<td class="yp-n" '+E+'>'+esc(r.n||'')+'</td>';
+      tr+='<td class="yp-c '+ypKind(r.span3)+'" colspan="3" '+E+'>'+esc(r.span3)+'</td>';
+    }else{
+      tr+='<td class="yp-n" '+E+'>'+esc(r.n||'')+'</td>';
+      if(!r.skip1) tr+='<td class="yp-c '+ypKind(r.c1)+'"'+(r.c1s?' rowspan="'+r.c1s+'"':'')+' '+E+'>'+esc(r.c1||'')+'</td>';
+      tr+='<td class="yp-c '+ypKind(r.c2)+'" '+E+'>'+esc(r.c2||'')+'</td>';
+      tr+='<td class="yp-c '+ypKind(r.c3)+'" '+E+'>'+esc(r.c3||'')+'</td>';
+    }
+    tr+='<td class="yp-hol" '+E+'>'+esc(r.hol||'')+'</td>';
+    if(r.fld!=null) tr+='<td class="yp-fld" rowspan="'+(r.fs||1)+'"><span '+E+'>'+esc(r.fld)+'</span></td>';
+    rows+=tr+'</tr>';
+  });
+  const E2='contenteditable="true" class="editor-cell"';
+  host.innerHTML='<div class="gwrap"><div class="lpdoc" id="ypDoc">'+
+   '<table class="lph"><tbody><tr>'+
+     '<td class="lk">المؤسسة</td><td '+E2+'>'+esc(settings.school)+'</td>'+
+     '<td class="lk">الأستاذ</td><td '+E2+'>'+esc(settings.teacher)+'</td>'+
+     '<td class="lk">الموسم الدراسي</td><td '+E2+'>'+esc(settings.year)+'</td>'+
+   '</tr></tbody></table>'+
+   '<div class="lp-title">التوزيع السنوي للحصص والأنشطة</div>'+
+   '<table class="yp"><thead><tr>'+
+     '<th style="width:7%">الشهر</th><th style="width:14%">التاريخ</th><th style="width:6%">رقم الحصة</th>'+
+     '<th style="width:15%">'+esc(YP_COLS[0])+'</th><th style="width:15%">'+esc(YP_COLS[1])+'</th><th style="width:15%">'+esc(YP_COLS[2])+'</th>'+
+     '<th style="width:16%">العطل والمناسبات الدينية والوطنية</th><th style="width:6%">الميادين</th>'+
+   '</tr></thead><tbody>'+rows+'</tbody></table></div></div>';
+}
+function saveYearPlan(){
+  const d=document.getElementById('ypDoc'); if(!d){toast('⚠️ افتح التدرّج أولاً');return;}
+  yearPlanSaved=d.innerHTML; persistYearPlan(); toast('✓ حُفظ التوزيع السنوي');
+}
+function resetYearPlan(){yearPlanSaved='';persistYearPlan();renderYearPlan(true);toast('تمت استعادة النموذج الرسمي');}
+function exportPdfYear(preview){
+  const d=document.getElementById('ypDoc'); if(!d){toast('⚠️ افتح التدرّج أولاً');return;}
+  const out=`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>التوزيع السنوي</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+@page{size:portrait;margin:5mm 6mm}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{font-family:'Tajawal',sans-serif;color:#16263a;font-size:9px;line-height:1.2}
+${preview?"body{background:#e9edf2;padding:14px}.sheet{background:#fff;max-width:820px;margin:0 auto;padding:14px 16px;box-shadow:0 6px 24px rgba(0,0,0,.15);border-radius:6px}":''}
+[contenteditable]{outline:none}.no-print{display:none!important}
+.org{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #0c2138;padding-bottom:3px;margin-bottom:4px}
+.org .o1{font-size:8.5px;font-weight:700;line-height:1.5}.org .o2{font-family:'Cairo';font-size:8.5px;font-weight:800;color:#0fa882}
+.lp-title{font-family:'Cairo';font-size:14px;font-weight:900;color:#0c2138;text-align:center;margin:3px 0 4px}
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+.lph td{border:1px solid #aab4c0;padding:2px 4px;font-size:9px;vertical-align:middle}
+.lph td.lk{background:#0c2138;color:#fff;font-family:'Cairo';font-weight:700;text-align:center;white-space:nowrap}
+.yp th{background:#0c2138;color:#fff;font-family:'Cairo';font-weight:700;font-size:8px;padding:3px 2px;border:1px solid #0c2138;text-align:center;line-height:1.25}
+.yp td{border:1px solid #aab4c0;padding:2px 3px;font-size:8.5px;text-align:center;vertical-align:middle}
+.yp .yp-mon{background:#eef2f7;font-family:'Cairo';font-weight:800;color:#0c2138}
+.yp .yp-n{font-family:'Cairo';font-weight:700;background:#f7f9fc}
+.yp .yp-hol{font-size:8px;color:#8a1f1f;font-weight:700}
+.yp .yp-brk{font-family:'Cairo';font-weight:900;font-size:12px;color:#0c2138;background:#eef2f7;padding:6px}
+.yp .yp-fld{background:#f3f6fa;font-family:'Cairo';font-weight:900;color:#8a1f1f;font-size:11px}
+.yp .yp-fld span{writing-mode:vertical-rl;transform:rotate(180deg);display:inline-block;white-space:nowrap}
+.yp .k-ev{background:#fde8e8;font-weight:700}.yp .k-dg{background:#e8f0fb;font-weight:700}
+.yp .k-ig{background:#fff4e0;font-weight:700}.yp .k-pr{background:#eaf7f2;font-weight:700}
+.sign{display:flex;gap:8px;margin-top:8px}
+.sign .col{flex:1;text-align:center;border:1px dashed #8895a3;border-radius:5px;padding:5px 4px}
+.sign .col .t{font-family:'Cairo';font-weight:800;font-size:9px;color:#0c2138;margin-bottom:3px}
+.sign .col .nm{font-size:9px;font-weight:600;min-height:11px;color:#16263a}.sign .col .box{height:26px}
+.foot{text-align:center;font-size:7.5px;color:#9aa7b5;margin-top:5px;font-family:'Cairo'}
+.pvbar{position:sticky;top:0;z-index:9;display:flex;gap:8px;justify-content:center;background:#0c2138;padding:9px;margin:-14px -14px 14px}
+.pvbar button{font-family:'Cairo';font-weight:700;font-size:12px;border:none;border-radius:8px;padding:8px 16px;cursor:pointer}
+.pvbar .pr{background:#27d3a4;color:#06231b}.pvbar .cl{background:rgba(255,255,255,.15);color:#fff}
+@media print{.pvbar{display:none!important}.sheet{box-shadow:none;border-radius:0;max-width:100%;padding:0}body{background:#fff;padding:0}}
+</style></head><body>
+${preview?'<div class="pvbar no-print"><button class="pr" onclick="window.print()">🖨 طباعة</button><button class="cl" onclick="window.close()">إغلاق</button></div>':''}
+<div class="sheet">
+<div class="org"><div class="o1">الجمهورية الجزائرية الديمقراطية الشعبية<br>وزارة التربية الوطنية — ${esc(settings.school)}</div><div class="o2">Smart _P.E · الدفتر البيداغوجي</div></div>
+${d.innerHTML}
+<div class="sign">
+  <div class="col"><div class="t">إمضاء وتأشيرة الأستاذ</div><div class="nm">${esc(settings.teacher)}</div><div class="box"></div></div>
+  <div class="col"><div class="t">إمضاء وتأشيرة السيد الناظر</div><div class="nm">${esc(settings.dirStudies)}</div><div class="box"></div></div>
+  <div class="col"><div class="t">إمضاء وتأشيرة السيد المدير</div><div class="nm">${esc(settings.principal)}</div><div class="box"></div></div>
+  <div class="col"><div class="t">إمضاء وتأشيرة السيد المفتش</div><div class="nm">${esc(settings.inspector)}</div><div class="box"></div></div>
+</div>
+<div class="foot">التوزيع السنوي للحصص والأنشطة · ${esc(settings.year)} — وثيقة مُولّدة عبر تطبيق Smart _P.E</div>
+</div>
+<script>document.querySelectorAll('[contenteditable]').forEach(function(e){e.setAttribute('contenteditable','false');});${preview?'':'window.onload=function(){setTimeout(function(){window.print();},400);};'}<\/script>
+</body></html>`;
+  pdfPrint(out);
+}
+function previewYear(){exportPdfYear(true);}
+
 // ===== ربط التمارين بالهدف والمرحلة =====
 function _sportBy(name){return SPORTS.indiv.concat(SPORTS.team).find(s=>s.name===name)||null;}
 function drillKey(sid,phase,slot,n){return sid+'|'+phase+'|'+slot+'|'+n;}
@@ -3290,7 +3493,7 @@ const firebaseConfig={
   messagingSenderId:"999797512825",
   appId:"1:999797512825:web:33de4012e8b0e2952ed2a8"
 };
-const SYNC_KEYS=['delbaz_eps_settings','delbaz_eps_classes','delbaz_eps_schedule','delbaz_eps_marks','delbaz_eps_crit','delbaz_eps_unit','delbaz_eps_lessons','delbaz_eps_terms','delbaz_eps_dailylogs','delbaz_eps_lessoninfo','delbaz_eps_drills'];
+const SYNC_KEYS=['delbaz_eps_settings','delbaz_eps_classes','delbaz_eps_schedule','delbaz_eps_marks','delbaz_eps_crit','delbaz_eps_unit','delbaz_eps_lessons','delbaz_eps_terms','delbaz_eps_dailylogs','delbaz_eps_lessoninfo','delbaz_eps_drills','delbaz_eps_yearplan'];
 
 // ===================== بحث عن تلميذ (3ب) =====================
 function _allSports(){return SPORTS.team.concat(SPORTS.indiv);}
@@ -3479,7 +3682,7 @@ function cloudPull(){
 }
 try{cloudInit();}catch(e){}
 
-loadSettings();loadClasses();loadSchedule();try{const u=localStorage.getItem('delbaz_eps_unit');if(u)unitPlan=JSON.parse(u);}catch(e){}try{const mk=localStorage.getItem('delbaz_eps_marks');if(mk)diagMarks=JSON.parse(mk);}catch(e){}try{const cc=localStorage.getItem('delbaz_eps_crit');if(cc)customCrit=JSON.parse(cc);}catch(e){}try{const ls=localStorage.getItem('delbaz_eps_lessons');if(ls)lessonsSaved=JSON.parse(ls);}catch(e){}try{const li=localStorage.getItem('delbaz_eps_lessoninfo');if(li)lessonInfo=JSON.parse(li);}catch(e){}try{const ts=localStorage.getItem('delbaz_eps_terms');if(ts)termSports=JSON.parse(ts);}catch(e){}try{const dr=localStorage.getItem('delbaz_eps_drills');if(dr)drillEdits=JSON.parse(dr);}catch(e){}try{const jn=localStorage.getItem('delbaz_eps_dailylogs');if(jn)dailyLogs=JSON.parse(jn);}catch(e){}cur=SPORTS.team.find(s=>s.id===termRec().team)||SPORTS.team[0];renderSubs();renderTermPick();render();initTab2();
+loadSettings();loadClasses();loadSchedule();try{const u=localStorage.getItem('delbaz_eps_unit');if(u)unitPlan=JSON.parse(u);}catch(e){}try{const mk=localStorage.getItem('delbaz_eps_marks');if(mk)diagMarks=JSON.parse(mk);}catch(e){}try{const cc=localStorage.getItem('delbaz_eps_crit');if(cc)customCrit=JSON.parse(cc);}catch(e){}try{const ls=localStorage.getItem('delbaz_eps_lessons');if(ls)lessonsSaved=JSON.parse(ls);}catch(e){}try{const li=localStorage.getItem('delbaz_eps_lessoninfo');if(li)lessonInfo=JSON.parse(li);}catch(e){}try{const ts=localStorage.getItem('delbaz_eps_terms');if(ts)termSports=JSON.parse(ts);}catch(e){}try{const dr=localStorage.getItem('delbaz_eps_drills');if(dr)drillEdits=JSON.parse(dr);}catch(e){}try{const yp=localStorage.getItem('delbaz_eps_yearplan');if(yp)yearPlanSaved=yp;}catch(e){}try{const jn=localStorage.getItem('delbaz_eps_dailylogs');if(jn)dailyLogs=JSON.parse(jn);}catch(e){}cur=SPORTS.team.find(s=>s.id===termRec().team)||SPORTS.team[0];renderSubs();renderTermPick();render();initTab2();
 setTimeout(showUpdate,800);
 window.addEventListener('load',function(){setTimeout(showUpdate,1400);});
 // تذكير لطيف بالنسخة الاحتياطية (إن مضى أكثر من 14 يوماً وهناك بيانات فعلية)
