@@ -68,6 +68,13 @@ nav::-webkit-scrollbar{display:none}
 .tab{border:none;background:rgba(255,255,255,.1);color:#cdd9e6;font-family:var(--fh);font-weight:700;font-size:12px;padding:9px 13px;border-radius:11px;cursor:pointer;white-space:nowrap;transition:.2s;position:relative}
 .tab.on{background:var(--mint);color:#06231b}
 .tab.dis{opacity:.5;cursor:not-allowed}
+.ctxbar{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:flex-end;padding:10px 14px 12px;background:#102a45;border-bottom:3px solid var(--mint)}
+.ctxbar .ctx-t{width:100%;font-family:var(--fh);font-weight:800;font-size:12px;color:var(--mint)}
+.ctxbar .ctx-f{flex:1 1 30%;min-width:96px}
+.ctxbar label{display:block;font-size:10px;font-weight:700;color:#9fb4c9;margin-bottom:3px}
+.ctxbar select{width:100%;font-size:13px;padding:8px 9px;border-radius:9px}
+.jt-term{font-size:11px;padding:3px 5px;border-radius:7px;margin-bottom:4px;max-width:100%}
+.ctxbar .ctx-n{width:100%;font-size:10px;color:#8aa2b9}
 .tab.dis::after{content:"قريباً";position:absolute;top:3px;left:6px;font-size:7px;background:var(--amber);color:#fff;padding:1px 4px;border-radius:6px;font-weight:700}
 .sec{padding:16px 18px}
 .pane{display:none}.pane.on{display:block}
@@ -515,11 +522,21 @@ body.dark .qr-link{background:#10202c}
   <nav>
     <button class="tab on" data-i="0" onclick="switchTab(0,this)">التقويم التشخيصي</button>
     <button class="tab" data-i="1" onclick="switchTab(1,this)">بناء الوحدة التعلمية</button>
-    <button class="tab" data-i="2" onclick="switchTab(2,this)">الدفتر اليومي</button>
     <button class="tab" data-i="3" onclick="switchTab(3,this)">المذكرة التربوية</button>
+    <button class="tab" data-i="2" onclick="switchTab(2,this)">الدفتر اليومي</button>
     <button class="tab" data-i="4" onclick="switchTab(4,this)">النظري</button>
     <button class="tab" data-i="5" onclick="switchTab(5,this)">الإعدادات</button>
   </nav>
+  <div class="ctxbar" id="ctxBar">
+    <div class="ctx-t">📌 مساحة العمل</div>
+    <div class="ctx-f"><label>المستوى</label>
+      <select id="mLevel" onchange="onLevelChange()"><option>سنة أولى ثانوي</option><option>سنة ثانية ثانوي</option><option>سنة ثالثة ثانوي</option></select></div>
+    <div class="ctx-f"><label>القسم</label>
+      <select id="mClass" onchange="loadRoster()"></select></div>
+    <div class="ctx-f"><label>الفصل</label>
+      <select id="mTerm" onchange="onTermChange()"><option>الفصل الأول</option><option>الفصل الثاني</option><option>الفصل الثالث</option></select></div>
+    <div class="ctx-n">لكل قسم وفصل ملفه الخاص (التشخيص · الوحدة · المذكرات)؛ يُحفظ تلقائياً ويُستعاد عند العودة.</div>
+  </div>
 
   <!-- ============ TAB 1 ============ -->
   <div class="sec pane on" id="tab1">
@@ -534,17 +551,11 @@ body.dark .qr-link{background:#10202c}
       <div class="meta-grid">
         <div class="fld"><label>المؤسسة</label><input id="mSchool" value="ثانوية الشهيد بلعيد"></div>
         <div class="fld"><label>الأستاذ</label><input id="mTeacher" value="Delbaz_ MED"></div>
-        <div class="fld"><label>المستوى</label>
-          <select id="mLevel" onchange="onLevelChange()"><option>سنة أولى ثانوي</option><option>سنة ثانية ثانوي</option><option>سنة ثالثة ثانوي</option></select></div>
-        <div class="fld"><label>القسم</label>
-          <select id="mClass" onchange="loadRoster()"></select></div>
       </div>
       <div id="rosterInfo" class="settings-note" style="margin:12px 0 0;display:none"></div>
     </div>
     <div class="block">
       <div class="block-h"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg>النشاط البدني المقوّم</div>
-      <div class="fld" style="margin-bottom:12px"><label>الفصل الدراسي</label>
-        <select id="mTerm" onchange="onTermChange()"><option>الفصل الأول</option><option>الفصل الثاني</option><option>الفصل الثالث</option></select></div>
       <div class="seg">
         <button class="on" onclick="setCat('team',this)">الأنشطة الجماعية</button>
         <button onclick="setCat('indiv',this)">الأنشطة الفردية</button>
@@ -602,7 +613,7 @@ body.dark .qr-link{background:#10202c}
         <div class="fld"><label>النشاط الفردي المختار</label><select id="uIndiv"></select></div>
       </div>
       <div class="fld full" style="margin-top:10px"><label>الكفاءة القاعدية للفصل (قابلة للتعديل)</label>
-        <textarea id="uFinal" rows="3" oninput="this.dataset.auto='0'"></textarea></div>
+        <textarea id="uFinal" rows="3" oninput="this.dataset.auto='0';saveUh()"></textarea></div>
     </div>
 
     <div class="block">
@@ -678,9 +689,9 @@ body.dark .qr-link{background:#10202c}
     <div class="block">
       <div class="block-h"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2zM22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>المذكرة التربوية — اختيار الحصة</div>
       <div class="meta-grid three">
-        <div class="fld"><label>المستوى</label>
+        <div class="fld" style="display:none"><label>المستوى</label>
           <select id="lLevel" onchange="lpFillClass()"><option>سنة أولى ثانوي</option><option>سنة ثانية ثانوي</option><option>سنة ثالثة ثانوي</option></select></div>
-        <div class="fld"><label>القسم</label><select id="lClass"></select></div>
+        <div class="fld" style="display:none"><label>القسم</label><select id="lClass"></select></div>
         <div class="fld"><label>رقم الحصة</label>
           <select id="lSession" onchange="renderLesson()">
             <option value="1">الحصة 01</option><option value="2">الحصة 02</option><option value="3">الحصة 03</option>
@@ -1009,8 +1020,15 @@ const isEx=function(i){return !!studentEx[i];};
 const activeCount=function(){let n=0;for(let i=0;i<students.length;i++)if(!studentEx[i])n++;return n;};
 let students=["أحمد","عمر","سارة","فاطمة","يوسف","ليلى","كريم","نور","رضا","وليد"]; // active roster (default sample)
 // ===== إصدار التطبيق وسجل التحديثات =====
-const APP_VERSION='3.5.2';
+const APP_VERSION='3.6.0';
 const CHANGELOG=[
+  {v:'الإصدار 3.6.0', items:[
+    'مساحة عمل مستقلة لكل قسم ولكل فصل: التقويم التشخيصي، بناء الوحدة، المذكرات والدفتر اليومي. تبدّل القسم وتعود فتجد كل شيء كما تركته.',
+    'شريط «مساحة العمل» (المستوى · القسم · الفصل) أعلى التطبيق، ويفتح التطبيق على آخر قسم عملت عليه.',
+    'ترتيب التبويبات: المذكرة التربوية قبل الدفتر اليومي.',
+    'الدفتر اليومي يحدّد فصل كل قسم، وتعديلات جدول الوحدة تُحفظ تلقائياً.',
+    'ترحيل آلي لبياناتك السابقة إلى الهيكل الجديد دون فقدان شيء، ونسخة تلقائية قبل التحديث.'
+  ]},
   {v:'الإصدار 3.5.2', items:[
     'السنة الثانية والسنة الثالثة ثانوي: الكفاءة الختامية والكفاءة القاعدية لكل فصل والهدف التعلمي (جماعي/فردي) بنصوص المنهاج الرسمي، وتختلف بين المستويين وبين الفصول.',
     'تظهر في التقويم التشخيصي وفي الوحدة التعلمية وفي المذكرة. المذكرات المحفوظة سابقاً: اضغط «استرجاع النموذج» لتحديثها.'
@@ -1766,13 +1784,128 @@ function getTargetObjective(level,sport,deficientCriterion){
   return (e&&e.target)?('أن يكون التلميذ قادراً على '+e.target):'';
 }
 
+
+// ===================== مساحة عمل مستقلة لكل (قسم ← فصل) =====================
+let units={};   // "classId|الفصل" -> مخطط الوحدة
+let _ctxReady=false,_lastSaved=null;
+let wsx={};     // "classId|الفصل" -> {diag:{team,indiv}, uh:{team,indiv,final,auto,season}} ؛ _last ؛ _active:{classId:الفصل}
+function ctxCid(){const e=document.getElementById('mClass');return (e&&e.value)||'';}
+function ctxKey(){const t=document.getElementById('mTerm');return (ctxCid()||'_')+'|'+(t?t.value:'الفصل الأول');}
+function persistUnits(){try{localStorage.setItem('delbaz_eps_units',JSON.stringify(units));}catch(e){}}
+function persistWsx(){try{localStorage.setItem('delbaz_eps_ws',JSON.stringify(wsx));}catch(e){}}
+function persistUnit(){if(unitPlan)units[ctxKey()]=unitPlan;else delete units[ctxKey()];persistUnits();}
+function wsRec(){const k=ctxKey();return (wsx[k]=wsx[k]||{});}
+function activeTerm(cid){return ((wsx._active||{})[cid])||'الفصل الأول';}
+function unitFor(cid,term){return units[cid+'|'+term]||null;}
+function saveUh(){
+  const g=id=>document.getElementById(id);if(!g('uTeam'))return;
+  wsRec().uh={team:g('uTeam').value,indiv:g('uIndiv').value,final:g('uFinal').value,auto:g('uFinal').dataset.auto||'1',season:g('uSeason').value};
+  persistWsx();
+}
+function ccKey(sid,cid){return (cid||ctxCid())+'|'+sid;}
+// معايير القسم المعدَّلة (نسخة خاصة بالقسم؛ وإلا النسخة القديمة المشتركة كاحتياط)
+function ccGet(sid,cid){return customCrit[ccKey(sid,cid)]||customCrit[sid]||null;}
+// تحميل مساحة العمل الحالية (القسم + الفصل) في كل التبويبات
+function loadCtx(){
+  const g=id=>document.getElementById(id);
+  const key=ctxKey(),cid=ctxCid(),lvl=g('mLevel').value,term=curTerm();
+  unitPlan=units[key]||null;
+  const w=wsx[key]||{};
+  diagStore.team=(w.diag&&w.diag.team)||null;diagStore.indiv=(w.diag&&w.diag.indiv)||null;
+  if(_ctxReady){wsx._active=wsx._active||{};if(cid)wsx._active[cid]=term;wsx._last={lvl:lvl,cid:cid,term:term};persistWsx();}
+  // رأس الوحدة
+  if(g('uTeam')&&g('uTeam').options.length){
+    const r=termRec(),uh=w.uh||{};
+    g('uTeam').value=uh.team||(diagStore.team?diagStore.team.sportId:r.team);
+    g('uIndiv').value=uh.indiv||(diagStore.indiv?diagStore.indiv.sportId:r.indiv);
+    g('uLevel').value=lvl;g('uLevel').disabled=true;
+    const cls=classes.find(c=>c.id===cid);g('uClass').value=cls?cls.name:'';g('uClass').readOnly=true;
+    if(uh.season)g('uSeason').value=uh.season;
+    const f=g('uFinal');
+    if(uh.auto==='0'&&uh.final){f.value=uh.final;f.dataset.auto='0';}
+    else{f.value=baseCompFor(lvl,term);f.dataset.auto='1';}
+    renderUnitFromPlan();refreshInject();
+  }
+  // المذكرة تتبع نفس القسم
+  const ll=g('lLevel'),lc=g('lClass');
+  if(ll&&lc){
+    ll.value=lvl;
+    const opts=classes.filter(c=>c.grade===lvl);
+    lc.innerHTML=opts.length?opts.map(c=>`<option value="${c.id}">${c.name}</option>`).join(''):'<option value="">— لا قسم —</option>';
+    lc.value=cid;
+    if(g('tab4')&&g('tab4').classList.contains('on'))renderLesson();
+  }
+  if(g('tab3')&&g('tab3').classList.contains('on'))renderJournal();
+}
+// ترحيل بيانات ما قبل 3.6 إلى الهيكل الجديد (مرة واحدة، دون حذف أي شيء)
+function migrateV36(){
+  try{
+    if(localStorage.getItem('delbaz_eps_v36')==='1')return;
+    let lu=null;try{lu=JSON.parse(localStorage.getItem('delbaz_eps_unit')||'null');}catch(e){}
+    const legT=(lu&&lu.term)||'الفصل الأول';
+    if(lu&&classes.length){
+      classes.forEach(c=>{if(lu.level&&c.grade!==lu.level)return;const k=c.id+'|'+legT;if(!units[k])units[k]=lu;});
+      persistUnits();
+    }
+    const fix=function(obj,persist){
+      Object.keys(obj).forEach(k=>{const parts=k.split('|');if(parts.length!==2)return;
+        const nk=parts[0]+'|'+legT+'|'+parts[1];if(obj[nk]==null)obj[nk]=obj[k];delete obj[k];});
+      persist();};
+    fix(lessonsSaved,persistLessons);
+    fix(lessonInfo,function(){try{localStorage.setItem('delbaz_eps_lessoninfo',JSON.stringify(lessonInfo));}catch(e){}});
+    Object.keys(dailyLogs).forEach(d=>{const r=dailyLogs[d]||{};Object.keys(r).forEach(c=>{if(r[c]&&!r[c].term)r[c].term=legT;});});
+    try{localStorage.setItem('delbaz_eps_dailylogs',JSON.stringify(dailyLogs));}catch(e){}
+    wsx._active=wsx._active||{};classes.forEach(c=>{if(!wsx._active[c.id])wsx._active[c.id]=legT;});
+    persistWsx();
+    localStorage.setItem('delbaz_eps_v36','1');
+  }catch(e){}
+}
+function restoreLastCtx(){
+  const l=_lastSaved;
+  try{
+    if(!l){ // أول تشغيل بعد الترحيل: افتح على الفصل الذي فيه عمل هذا القسم
+      const a=(wsx._active||{})[ctxCid()],tm0=document.getElementById('mTerm');
+      if(a&&tm0.value!==a){tm0.value=a;loadRoster();}
+      return;
+    }
+    const lv=document.getElementById('mLevel'),cl=document.getElementById('mClass'),tm=document.getElementById('mTerm');
+    if(l.lvl&&[].some.call(lv.options,o=>o.value===l.lvl)&&lv.value!==l.lvl){lv.value=l.lvl;fillClassSelector();}
+    if(l.cid&&[].some.call(cl.options,o=>o.value===l.cid)){cl.value=l.cid;}
+    if(l.term&&tm.value!==l.term)tm.value=l.term;
+    loadRoster();
+  }catch(e){}
+  finally{_ctxReady=true;try{loadCtx();}catch(e){}}
+}
+function loadWorkspaces(){
+  try{const u=localStorage.getItem('delbaz_eps_units');if(u)units=JSON.parse(u)||{};}catch(e){units={};}
+  try{const w=localStorage.getItem('delbaz_eps_ws');if(w)wsx=JSON.parse(w)||{};}catch(e){wsx={};}
+  _lastSaved=wsx._last?JSON.parse(JSON.stringify(wsx._last)):null;
+}
+// جدول الوحدة: يُرسَم من المخطط المحفوظ، وتعديل الخانات يُحفظ تلقائياً
+function unitRowHtml(r,i){
+  return `<tr class="${r.cls==='formative'?'mid':''}"><td class="sn">${r.n}</td>
+      <td style="text-align:center"><span class="asmt ${r.cls}">${r.type}</span></td>
+      <td><textarea oninput="unitEdit(${i},'t',this.value)">${esc(r.t)}</textarea></td>
+      <td><textarea oninput="unitEdit(${i},'i',this.value)">${esc(r.i)}</textarea></td>
+      <td><textarea oninput="unitEdit(${i},'c',this.value)">${esc(r.c)}</textarea></td></tr>`;
+}
+function unitEdit(i,f,v){if(!unitPlan||!unitPlan.rows[i])return;unitPlan.rows[i][f]=v;persistUnit();}
+function renderUnitFromPlan(){
+  const body=document.getElementById('uBody'),ph=document.getElementById('unitPlaceholder'),out=document.getElementById('unitOut');
+  if(!body)return;
+  if(unitPlan&&unitPlan.rows){
+    body.innerHTML=unitPlan.rows.map(unitRowHtml).join('');
+    ph.style.display='none';out.style.display='block';
+  }else{body.innerHTML='';ph.style.display='';out.style.display='none';}
+}
+
 let cat='team', cur=SPORTS.team[0];
 let customCrit={}; // sportId -> [5 strings]
 let diagMarks={}; // "classId|sportId" -> [[0/1,...] per crit] per student
 const diagStore={team:null,indiv:null}; // {sportId,sportName,goals:[{crit,goal,fail}]}
 
 function getCrit(s){
-  if(customCrit[s.id])return customCrit[s.id];
+  const _cc=ccGet(s.id);if(_cc)return _cc;
   const le=document.getElementById('mLevel');
   const db=le?pedagogyDatabase[levelKey(le.value)]?.[s.name]:null;
   if(db){const arr=[];for(let i=1;i<=5;i++)arr.push(db[i]?db[i].criterion:(s.crit[i-1]||('المعيار '+i)));return arr;}
@@ -1783,7 +1916,7 @@ function goalFor(sportObj,c){
   const le=document.getElementById('mLevel');const lvl=le?le.value:'';
   const dbS=pedagogyDatabase[levelKey(lvl)]?.[sportObj.name];
   const dbCrit=dbS&&dbS[c+1]?String(dbS[c+1].criterion).trim():String(sportObj.crit[c]||'').trim();
-  const cust=(customCrit[sportObj.id]&&customCrit[sportObj.id][c]!=null)?String(customCrit[sportObj.id][c]).trim():'';
+  const _cg=ccGet(sportObj.id);const cust=(_cg&&_cg[c]!=null)?String(_cg[c]).trim():'';
   if(cust && cust!==dbCrit){
     const body=cust.replace(/^أن يكون التلميذ قادرا[ًّؐ]?\s*على\s*/,'');
     return 'أن يكون التلميذ قادراً على '+body;
@@ -1798,7 +1931,11 @@ function persistCustomCrit(){try{localStorage.setItem('delbaz_eps_crit',JSON.str
 let termSports={}; // "الفصل الأول" -> {team:sportId, indiv:sportId}
 function persistTerms(){try{localStorage.setItem('delbaz_eps_terms',JSON.stringify(termSports));}catch(e){}}
 function curTerm(){const e=document.getElementById('mTerm');return e?e.value:'الفصل الأول';}
-function termRec(){const t=curTerm();return (termSports[t]=termSports[t]||{team:SPORTS.team[0].id,indiv:SPORTS.indiv[0].id});}
+function termRec(){
+  const k=ctxKey(),t=curTerm();
+  if(!termSports[k]){const lg=termSports[t];termSports[k]=lg?{team:lg.team,indiv:lg.indiv}:{team:SPORTS.team[0].id,indiv:SPORTS.indiv[0].id};}
+  return termSports[k];
+}
 function renderTermPick(){
   const r=termRec();
   const tn=(SPORTS.team.find(s=>s.id===r.team)||{}).name||'—';
@@ -1806,7 +1943,7 @@ function renderTermPick(){
   const box=document.getElementById('termPick');
   if(box)box.innerHTML=`نشاطا ${esc(curTerm())} — <b>جماعي:</b> ${esc(tn)} · <b>فردي:</b> ${esc(inm)}`;
 }
-function onTermChange(){const r=termRec();cur=SPORTS[cat].find(s=>s.id===(cat==='team'?r.team:r.indiv))||SPORTS[cat][0];renderSubs();renderTermPick();render();}
+function onTermChange(){const r=termRec();cur=SPORTS[cat].find(s=>s.id===(cat==='team'?r.team:r.indiv))||SPORTS[cat][0];renderSubs();renderTermPick();hideReport();render();loadCtx();}
 
 function setCat(c,btn){cat=c;document.querySelectorAll('#tab1 .seg button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');const r=termRec();cur=SPORTS[c].find(s=>s.id===(c==='team'?r.team:r.indiv))||SPORTS[c][0];renderSubs();render();}
 function renderSubs(){document.getElementById('subs').innerHTML=SPORTS[cat].map((s)=>`<button class="sub-b ${s.id===cur.id?'on':''}" onclick="pick('${s.id}',this)"><svg viewBox="0 0 24 24">${s.icon}</svg>${s.name}</button>`).join('');}
@@ -1839,8 +1976,8 @@ function render(){
   recalc();
 }
 function editCrit(el){
-  const c=+el.dataset.c;if(!customCrit[cur.id])customCrit[cur.id]=getCrit(cur).slice();
-  customCrit[cur.id][c]=el.textContent.trim()||cur.crit[c];
+  const c=+el.dataset.c;const _k=ccKey(cur.id);if(!customCrit[_k])customCrit[_k]=getCrit(cur).slice();
+  customCrit[_k][c]=el.textContent.trim()||cur.crit[c];
   persistCustomCrit();recalc();
   // ربط حيّ كامل: المعيار + هدفه يتغيّران في التقرير والوحدة والمذكرة والدفتر
   save(true);                 // يعيد استخراج معايير النشاطين ويحدّث التقرير (دون قفز/إشعار)
@@ -1863,7 +2000,7 @@ function rebuildUnitSilently(){
   if(diagStore.team)unitPlan.teamSport=diagStore.team.sportName;
   if(diagStore.indiv)unitPlan.indivSport=diagStore.indiv.sportName;
   unitPlan.rows.forEach(r=>{if(r.cls==='learn'){r.t=tD[li].g;r.i=iD[li].g;r.tc=tD[li].c;r.ic=iD[li].c;r.ts=tD[li].s;r.is=iD[li].s;li++;}});
-  try{localStorage.setItem('delbaz_eps_unit',JSON.stringify(unitPlan));}catch(e){}
+  persistUnit();
   // حدّث جدول الوحدة المعروض إن كان مفتوحاً
   if(document.getElementById('tab2')&&document.getElementById('tab2').classList.contains('on')){
     const trs=document.querySelectorAll('#uBody tr');
@@ -1922,6 +2059,7 @@ function save(silent){
     goals:eT.crit.map((label,c)=>({c:c,sk:skillFor(teamSport.id,document.getElementById('mLevel').value,c),crit:label,goal:goalFor(teamSport,c),fail:eT.fr[c]}))};
   diagStore.indiv={sportId:indivSport.id,sportName:indivSport.name,
     goals:eI.crit.map((label,c)=>({c:c,sk:skillFor(indivSport.id,document.getElementById('mLevel').value,c),crit:label,goal:goalFor(indivSport,c),fail:eI.fr[c]}))};
+  {const _w=wsRec();_w.diag={team:diagStore.team,indiv:diagStore.indiv};persistWsx();}
   const _cn=(classes.find(c=>c.id==document.getElementById('mClass').value)||{}).name||'—';
   document.getElementById('repMeta').innerHTML=[document.getElementById('mSchool').value,'الأستاذ: '+document.getElementById('mTeacher').value,document.getElementById('mLevel').value,'القسم: '+_cn,curTerm(),'النشاطان: '+teamSport.name+' + '+indivSport.name,'التاريخ: '+new Date().toLocaleDateString('fr-FR')].map(x=>`<span>${x}</span>`).join('');
   const sumLine=e=>`نشاط <b>${e.sportObj.name}</b>: ${e.m} متحكم، ${e.med} متوسط، ${e.no} غير متحكم${e.def.length?`؛ أبرز النقائص: <b>${e.def.map(d=>d.label).join('، ')}</b>`:'؛ لا نقائص رئيسية'}.`;
@@ -1948,9 +2086,10 @@ function switchTab(idx,btn){
   document.querySelectorAll('.pane').forEach(p=>p.classList.remove('on'));
   document.getElementById('tab'+(idx+1)).classList.add('on');
   document.getElementById('fab').style.display=idx===0?'flex':'none';
+  document.getElementById('ctxBar').style.display=(idx===0||idx===1||idx===3)?'flex':'none';
   if(idx===1){syncUnitFromDiag();refreshInject();}
   if(idx===2)initJournal();
-  if(idx===3){lpFillClass();renderLesson();}
+  if(idx===3){loadCtx();renderLesson();}
   if(idx===4)renderTheory();
   if(idx===5){try{renderSnaps();}catch(e){}const av=document.getElementById('aboutVer');if(av)av.textContent='الإصدار '+APP_VERSION;}
   window.scrollTo({top:0});
@@ -2019,26 +2158,16 @@ function toggleTheme(){
 }
 
 // pull level + class (+ diagnosed sports) from the diagnostic tab into the unit tab
-function syncUnitFromDiag(){
-  const lvl=document.getElementById('mLevel').value;
-  document.getElementById('uLevel').value=lvl;
-  const cls=classes.find(c=>c.id==document.getElementById('mClass').value);
-  document.getElementById('uClass').value=cls?cls.name:'';
-  // reflect diagnosed sports if available
-  if(diagStore.team)document.getElementById('uTeam').value=diagStore.team.sportId;
-  if(diagStore.indiv)document.getElementById('uIndiv').value=diagStore.indiv.sportId;
-  // keep final competency consistent with level unless teacher already edited it
-  const f=document.getElementById('uFinal');
-  if(!f.value.trim()||f.dataset.auto==='1'){f.value=baseCompFor(lvl,curTerm());f.dataset.auto='1';}
-}
+function syncUnitFromDiag(){loadCtx();}
 
 // ===== TAB 2 LOGIC =====
 function initTab2(){
   document.getElementById('uTeam').innerHTML=SPORTS.team.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
   document.getElementById('uIndiv').innerHTML=SPORTS.indiv.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
-  document.getElementById('uTeam').onchange=refreshInject;
-  document.getElementById('uIndiv').onchange=refreshInject;
-  setFinalComp();
+  document.getElementById('uTeam').onchange=function(){refreshInject();saveUh();};
+  document.getElementById('uIndiv').onchange=function(){refreshInject();saveUh();};
+  document.getElementById('uSeason').oninput=saveUh;
+  loadCtx();
 }
 function setFinalComp(){const f=document.getElementById('uFinal');f.value=baseCompFor(document.getElementById('uLevel').value,curTerm());f.dataset.auto='1';}
 
@@ -2082,17 +2211,10 @@ function generateUnit(){
     learnRow('06'),learnRow('07'),
     {n:'08',type:'تقويم تحصيلي',cls:'sum',mid:false,t:'إدماج وتثبيت مكتسبات النشاط الجماعي في وضعية لعب كاملة.',i:'إدماج وتثبيت مكتسبات النشاط الفردي في وضعية إنجاز كاملة.',c:'وضعية إدماجية شاملة وتقويم الأداء النهائي مقارنةً بالكفاءة القاعدية للفصل وإسناد العلامات.'}
   ];
-  document.getElementById('uBody').innerHTML=rows.map(r=>
-    `<tr class="${r.mid?'mid':''}"><td class="sn">${r.n}</td>
-      <td style="text-align:center"><span class="asmt ${r.cls}">${r.type}</span></td>
-      <td><textarea>${r.t}</textarea></td>
-      <td><textarea>${r.i}</textarea></td>
-      <td><textarea>${r.c}</textarea></td></tr>`).join('');
-  // store globally for journal + lesson plan
+  // store for this workspace (class + term): journal + lesson plan read from here
   unitPlan={level:document.getElementById('uLevel').value,term:curTerm(),teamSport:teamD.sport.name,indivSport:indivD.sport.name,rows:rows.map(r=>({n:r.n,type:r.type,cls:r.cls,t:r.t,i:r.i,c:r.c,tc:r.tc,ic:r.ic,ts:r.ts,is:r.is}))};
-  try{localStorage.setItem('delbaz_eps_unit',JSON.stringify(unitPlan));}catch(e){}
-  document.getElementById('unitPlaceholder').style.display='none';
-  document.getElementById('unitOut').style.display='block';
+  persistUnit();saveUh();
+  renderUnitFromPlan();
   toast('✓ تم توليد مخطط الوحدة الفصلية على 8 حصص');
 }
 
@@ -2461,6 +2583,9 @@ function delClass(id){
   if(c && !confirm('حذف الفوج «'+c.name+'» نهائياً؟\nستُحذف معه نتائج التقويم الخاصة به.'))return;
   classes=classes.filter(x=>x.id!==id);
   Object.keys(diagMarks).forEach(function(k){ if(k.indexOf(id+'|')===0) delete diagMarks[k]; });
+  [units,wsx,lessonsSaved,lessonInfo,customCrit,termSports].forEach(function(o){Object.keys(o).forEach(function(k){if(k.indexOf(id+'|')===0)delete o[k];});});
+  if(wsx._active)delete wsx._active[id];
+  persistUnits();persistWsx();persistLessons();persistCustomCrit();persistTerms();
   persistMarks();persistClasses();renderClassList();fillClassSelector();toast('تم حذف الفوج');
 }
 // ===== إدارة الفوج: تعديل · إضافة · حذف =====
@@ -2547,7 +2672,8 @@ function loadRoster(){
   const info=document.getElementById('rosterInfo');
   if(cls){students=cls.names.slice();studentEx=(cls.ex||[]).slice();const _ne=studentEx.filter(Boolean).length;info.style.display='block';info.textContent='القسم: '+cls.name+' — '+students.length+' تلميذاً'+(_ne?' (منهم '+_ne+' معفى، لا يُحتسب)':'')+' (قائمة محمّلة من الإعدادات).';}
   else{studentEx=[];students=["أحمد","عمر","سارة","فاطمة","يوسف","ليلى","كريم","نور","رضا","وليد"];info.style.display='block';info.textContent='لا يوجد قسم محفوظ لهذا المستوى — تُعرض قائمة نموذجية. أنشئ الأقسام من تبويب الإعدادات.';}
-  hideReport();render();
+  {const _r=termRec();cur=SPORTS[cat].find(s=>s.id===(cat==='team'?_r.team:_r.indiv))||SPORTS[cat][0];renderSubs();renderTermPick();}
+  hideReport();render();loadCtx();
 }
 
 // ===== WEEKLY SCHEDULE (compact timetable grid) =====
@@ -2663,15 +2789,16 @@ function fillArchive(){
   }).join('');
 }
 function openArchive(d){if(!d)return;document.getElementById('jDate').value=d;renderJournal();}
-function lessonData(k,classId){
-  const cid=classId||'';
+function lessonData(k,classId,term){
+  const cid=classId||'';term=term||activeTerm(cid);
+  const unitPlan=unitFor(cid,term);
   const fin=L=>({indivSport:L.indivSport,teamSport:L.teamSport,indivTarget:L.indivTarget,teamTarget:L.teamTarget,
     act1Subs:(L.act1Subs&&L.act1Subs.length)?L.act1Subs:['—'],
     act2Subs:(L.act2Subs&&L.act2Subs.length)?L.act2Subs:['—']});
   // 1) المذكرة المحفوظة لهذا القسم والحصة: تُقرأ مباشرة (فتتبع الدفتر آخر تعديل حتى للمذكرات القديمة)
-  const saved=lessonsSaved[cid+'|'+(k+1)];
+  const saved=lessonsSaved[cid+'|'+term+'|'+(k+1)];
   if(saved){try{const L=lessonInfoFromHtml(saved);if(L&&(L.act1Subs.length||L.act2Subs.length))return fin(L);}catch(e){}}
-  const key=cid+'|'+k;
+  const key=cid+'|'+term+'|'+k;
   if(lessonInfo[key])return fin(lessonInfo[key]);
   if(!unitPlan)return null;
   // 2) لا مذكرة محفوظة: نبني نفس ما تولّده المذكرة تلقائياً (هدف التحضيري + عناوين التمارين + هدف الختامي)
@@ -2717,7 +2844,7 @@ function renderJournal(){
   const rec=dailyLogs[val]=dailyLogs[val]||{};
   // تسجيل اليوم آلياً بمجرد عرضه (لا يُشترط أي إجراء من الأستاذ)
   let added=false;
-  slots.forEach(s=>{if(!rec[s.classId]){rec[s.classId]={session:0,note:''};added=true;}});
+  slots.forEach(s=>{if(!rec[s.classId]){rec[s.classId]={session:0,note:'',term:activeTerm(s.classId)};added=true;}else if(!rec[s.classId].term){rec[s.classId].term=activeTerm(s.classId);added=true;}});
   Object.keys(byLevel).forEach(level=>{
     let rows='';
     byLevel[level].forEach(({slot,cls})=>{
@@ -2726,7 +2853,7 @@ function renderJournal(){
       rows+=`<tr data-cls="${cls.id}">
         <td class="jt-date">${esc(val)}</td>
         <td class="jt-time">${esc(slot.time)}</td>
-        <td class="jt-cls"><b>${esc(cls.name)}</b><div class="jt-sess">حصة: <select onchange="journalRow(this)">${sessOpts}</select></div></td>
+        <td class="jt-cls"><b>${esc(cls.name)}</b><div class="jt-sess">${termOpts(r.term||activeTerm(cls.id))}</div><div class="jt-sess">حصة: <select onchange="journalRow(this)">${sessOpts}</select></div></td>
         <td class="jt-act act1"></td>
         <td class="jt-act act2"></td>
         <td class="jt-note editor-cell" contenteditable="true" data-cls="${cls.id}" oninput="saveJNote(this)">${esc(r.note||'')}</td>
@@ -2741,13 +2868,16 @@ function renderJournal(){
   document.querySelectorAll('#journalBody tbody tr').forEach(tr=>{const cid=tr.dataset.cls;const r=rec[cid]||{session:0};fillJournalRow(tr,r.session||0);});
   if(added)persistDailyLogs();
 }
+function termOpts(t){return '<select class="jt-term" onchange="journalTerm(this)">'+['الفصل الأول','الفصل الثاني','الفصل الثالث'].map(x=>`<option ${x===t?'selected':''}>${x}</option>`).join('')+'</select>';}
+function journalTerm(sel){const tr=sel.closest('tr');const cid=tr.dataset.cls;const rec=logRec();rec[cid]=rec[cid]||{};rec[cid].term=sel.value;persistDailyLogs();fillJournalRow(tr,rec[cid].session||0);}
 function logRec(){const d=document.getElementById('jDate').value;return (dailyLogs[d]=dailyLogs[d]||{});}
 function persistDailyLogs(){try{localStorage.setItem('delbaz_eps_dailylogs',JSON.stringify(dailyLogs));}catch(e){}fillArchive();}
 function journalRow(sel){const tr=sel.closest('tr');const cid=tr.dataset.cls;const k=+sel.value;
   const rec=logRec();rec[cid]=rec[cid]||{};rec[cid].session=k;persistDailyLogs();
   fillJournalRow(tr,k);}
 function fillJournalRow(tr,k){
-  const d=lessonData(k,tr.dataset.cls);
+  const _rc=logRec()[tr.dataset.cls]||{};
+  const d=lessonData(k,tr.dataset.cls,_rc.term);
   const a1=tr.querySelector('.act1'),a2=tr.querySelector('.act2');
   if(!d){a1.innerHTML=a2.innerHTML='<span class="jna">ولّد مخطط الوحدة أولاً</span>';return;}
   a1.innerHTML=actCell(d.indivSport,d.indivTarget,d.act1Subs);
@@ -2758,7 +2888,7 @@ function saveJNote(el){const cid=el.dataset.cls;const rec=logRec();rec[cid]=rec[
 // ===== LESSON PLAN =====
 let lessonsSaved={}; // "classId|session" -> lessonDoc innerHTML
 let lessonInfo={}; // "classId|k0" -> {indivSport,teamSport,indivTarget,teamTarget,act1Subs,act2Subs}
-function lessonKey(){return (document.getElementById('lClass').value||'_')+'|'+document.getElementById('lSession').value;}
+function lessonKey(){return (document.getElementById('lClass').value||'_')+'|'+curTerm()+'|'+document.getElementById('lSession').value;}
 function persistLessons(){try{localStorage.setItem('delbaz_eps_lessons',JSON.stringify(lessonsSaved));}catch(e){}}
 function saveLesson(){
   const doc=document.getElementById('lessonDoc');if(!doc){toast('⚠️ افتح المذكرة أولاً');return;}
@@ -2766,7 +2896,7 @@ function saveLesson(){
   // التقاط الحقول لربط الدفتر اليومي بالمذكرة (لنفس القسم والحصة)
   const classId=document.getElementById('lClass').value||'';
   const k0=(+document.getElementById('lSession').value)-1;
-  lessonInfo[classId+'|'+k0]=extractLessonInfo(doc);
+  lessonInfo[classId+'|'+curTerm()+'|'+k0]=extractLessonInfo(doc);
   try{localStorage.setItem('delbaz_eps_lessoninfo',JSON.stringify(lessonInfo));}catch(e){}
   if(document.getElementById('tab3')&&document.getElementById('tab3').classList.contains('on'))renderJournal();
   toast('✓ حُفظت تعديلات المذكرة وسُجّلت في الدفتر اليومي');
@@ -2816,6 +2946,7 @@ function lpFillClass(){
   const lvl=document.getElementById('lLevel').value, sel=document.getElementById('lClass');
   const opts=classes.filter(c=>c.grade===lvl);
   sel.innerHTML=opts.length?opts.map(c=>`<option value="${c.id}">${c.name}</option>`).join(''):'<option value="">— لا قسم —</option>';
+  {const _c=ctxCid();if(_c&&opts.some(c=>c.id===_c))sel.value=_c;}
   renderLesson();
 }
 // ===== ربط التمارين بالهدف والمرحلة =====
@@ -2824,7 +2955,7 @@ function drillKey(sid,phase,slot,n){return sid+'|'+phase+'|'+slot+'|'+n;}
 // نص المعيار كما يراه الأستاذ في هذا المستوى (تعديله الخاص ← القاعدة الرسمية ← الافتراضي)
 function critNameFor(sp,lvl,ci){
   if(!sp)return '';
-  if(customCrit[sp.id]&&customCrit[sp.id][ci])return String(customCrit[sp.id][ci]);
+  {const _g=ccGet(sp.id);if(_g&&_g[ci])return String(_g[ci]);}
   const db=pedagogyDatabase[levelKey(lvl)]?.[sp.name];
   if(db&&db[ci+1]&&db[ci+1].criterion)return db[ci+1].criterion;
   return sp.crit[ci]||'';
@@ -3477,12 +3608,12 @@ const firebaseConfig={
   messagingSenderId:"999797512825",
   appId:"1:999797512825:web:33de4012e8b0e2952ed2a8"
 };
-const SYNC_KEYS=['delbaz_eps_settings','delbaz_eps_classes','delbaz_eps_schedule','delbaz_eps_marks','delbaz_eps_crit','delbaz_eps_unit','delbaz_eps_lessons','delbaz_eps_terms','delbaz_eps_dailylogs','delbaz_eps_lessoninfo','delbaz_eps_drills'];
+const SYNC_KEYS=['delbaz_eps_settings','delbaz_eps_classes','delbaz_eps_schedule','delbaz_eps_marks','delbaz_eps_crit','delbaz_eps_unit','delbaz_eps_units','delbaz_eps_ws','delbaz_eps_lessons','delbaz_eps_terms','delbaz_eps_dailylogs','delbaz_eps_lessoninfo','delbaz_eps_drills'];
 
 // ===================== بحث عن تلميذ (3ب) =====================
 function _allSports(){return SPORTS.team.concat(SPORTS.indiv);}
-function _critLabels(sportId){
-  if(customCrit[sportId]) return customCrit[sportId];
+function _critLabels(sportId,cid){
+  {const _g=ccGet(sportId,cid);if(_g) return _g;}
   const sp=_allSports().find(s=>s.id===sportId);
   return sp?sp.crit:[];
 }
@@ -3505,7 +3636,7 @@ function runStudentSearch(){
       const rows=diagMarks[key];
       if(!rows||!rows[m.idx])return;
       const row=rows[m.idx];
-      const labels=_critLabels(sp.id);
+      const labels=_critLabels(sp.id,m.cls.id);
       let ok=0,items='';
       labels.forEach(function(lb,ci){
         const v=(row[ci]===1);
@@ -3808,7 +3939,7 @@ function cloudPull(){
 try{safetyStartup();}catch(e){}
 try{cloudInit();}catch(e){}
 
-loadSettings();loadClasses();loadSchedule();try{const u=localStorage.getItem('delbaz_eps_unit');if(u)unitPlan=JSON.parse(u);}catch(e){}try{const mk=localStorage.getItem('delbaz_eps_marks');if(mk)diagMarks=JSON.parse(mk);}catch(e){}try{const cc=localStorage.getItem('delbaz_eps_crit');if(cc)customCrit=JSON.parse(cc);}catch(e){}try{const ls=localStorage.getItem('delbaz_eps_lessons');if(ls)lessonsSaved=JSON.parse(ls);}catch(e){}try{const li=localStorage.getItem('delbaz_eps_lessoninfo');if(li)lessonInfo=JSON.parse(li);}catch(e){}try{const ts=localStorage.getItem('delbaz_eps_terms');if(ts)termSports=JSON.parse(ts);}catch(e){}try{const dr=localStorage.getItem('delbaz_eps_drills');if(dr)drillEdits=JSON.parse(dr);}catch(e){}try{const jn=localStorage.getItem('delbaz_eps_dailylogs');if(jn)dailyLogs=JSON.parse(jn);}catch(e){}cur=SPORTS.team.find(s=>s.id===termRec().team)||SPORTS.team[0];renderSubs();renderTermPick();render();initTab2();
+loadWorkspaces();loadSettings();loadClasses();loadSchedule();try{const mk=localStorage.getItem('delbaz_eps_marks');if(mk)diagMarks=JSON.parse(mk);}catch(e){}try{const cc=localStorage.getItem('delbaz_eps_crit');if(cc)customCrit=JSON.parse(cc);}catch(e){}try{const ls=localStorage.getItem('delbaz_eps_lessons');if(ls)lessonsSaved=JSON.parse(ls);}catch(e){}try{const li=localStorage.getItem('delbaz_eps_lessoninfo');if(li)lessonInfo=JSON.parse(li);}catch(e){}try{const ts=localStorage.getItem('delbaz_eps_terms');if(ts)termSports=JSON.parse(ts);}catch(e){}try{const dr=localStorage.getItem('delbaz_eps_drills');if(dr)drillEdits=JSON.parse(dr);}catch(e){}try{const jn=localStorage.getItem('delbaz_eps_dailylogs');if(jn)dailyLogs=JSON.parse(jn);}catch(e){}migrateV36();restoreLastCtx();cur=SPORTS.team.find(s=>s.id===termRec().team)||SPORTS.team[0];renderSubs();renderTermPick();render();initTab2();
 setTimeout(showUpdate,800);
 window.addEventListener('load',function(){setTimeout(showUpdate,1400);});
 // تذكير لطيف بالنسخة الاحتياطية (إن مضى أكثر من 14 يوماً وهناك بيانات فعلية)
