@@ -800,6 +800,9 @@ body.dark .qr-link{background:#10202c}
         استيراد نسخة احتياطية
       </button>
       <input type="file" id="bkFile" accept="application/json,.json" style="display:none" onchange="importBackup(this)">
+      <div class="block-h" style="margin-top:16px;font-size:13px">🛡️ نسخ تلقائية على هذا الجهاز</div>
+      <div class="settings-note">يحفظ التطبيق نفسه نسخة من عملك يومياً، وقبل كل تحديث، وقبل أي مزامنة أو استيراد. إن بدا أن شيئاً ضاع فاسترجع آخر نسخة سليمة من هنا.</div>
+      <div id="snapBox"></div>
       <div class="settings-note" style="margin-top:10px">💡 ينصح بتصدير نسخة احتياطية كل نهاية أسبوع، وحفظها في مكان آمن (Google Drive أو البريد).</div>
     </div>
     <div class="block">
@@ -1006,8 +1009,13 @@ const isEx=function(i){return !!studentEx[i];};
 const activeCount=function(){let n=0;for(let i=0;i<students.length;i++)if(!studentEx[i])n++;return n;};
 let students=["أحمد","عمر","سارة","فاطمة","يوسف","ليلى","كريم","نور","رضا","وليد"]; // active roster (default sample)
 // ===== إصدار التطبيق وسجل التحديثات =====
-const APP_VERSION='3.5.0';
+const APP_VERSION='3.5.1';
 const CHANGELOG=[
+  {v:'الإصدار 3.5.1', items:[
+    'حماية العمل من الضياع: نسخ تلقائية على الجهاز (يومياً، وقبل كل تحديث، وقبل أي مزامنة أو استيراد) مع استرجاع بضغطة من الإعدادات.',
+    'المزامنة السحابية لم تعد تستبدل عملاً محلياً أحدث بنسخة أقدم؛ وفي حال التعارض تُحفظ نسخة الطرفين.',
+    'ضغط البيانات الكبيرة قبل رفعها للسحابة وتنبيه عند فشل المزامنة، وطلب تخزين دائم من المتصفح لمنع حذف البيانات.'
+  ]},
   {v:'الإصدار 3.5.0', items:[
     'ربط صارم بين الهدف الخاص والتمارين: تُخزَّن مهارة الهدف عند توليد الوحدة، فتُجلب تمارين نفس المهارة مهما اختلف مستوى القسم أو مستوى التشخيص.',
     'حصص التقويم (التشخيصي، التكويني، التحصيلي) لها تمارين تقويمية خاصة بها بدل تمارين معيار غير مقصود.',
@@ -1903,7 +1911,7 @@ function switchTab(idx,btn){
   if(idx===2)initJournal();
   if(idx===3){lpFillClass();renderLesson();}
   if(idx===4)renderTheory();
-  if(idx===5){const av=document.getElementById('aboutVer');if(av)av.textContent='الإصدار '+APP_VERSION;}
+  if(idx===5){try{renderSnaps();}catch(e){}const av=document.getElementById('aboutVer');if(av)av.textContent='الإصدار '+APP_VERSION;}
   window.scrollTo({top:0});
 }
 function gotoSettings(){switchTab(5);}
@@ -3498,9 +3506,11 @@ function importBackup(input){
     const cnt=Object.keys(d).filter(k=>SYNC_KEYS.indexOf(k)>=0).length;
     if(!cnt){toast('⚠️ لا توجد بيانات معروفة في الملف');input.value='';return;}
     if(!confirm('سيتم استبدال كل البيانات الحالية ببيانات النسخة الاحتياطية ('+cnt+' عنصراً).\nهل أنت متأكد؟')){input.value='';return;}
+    snapPut('قبل استيراد نسخة احتياطية').then(function(){
     SYNC_KEYS.forEach(function(k){ if(d[k]!=null) localStorage.setItem(k,d[k]); });
     toast('✓ تم الاستيراد — سيُعاد تحميل التطبيق');
     setTimeout(()=>location.reload(),900);
+    });
   };
   rd.readAsText(file);
 }
@@ -3508,9 +3518,6 @@ let _fbAuth=null,_fbDb=null,_fbUser=null,_pushTimer=null,_pulled=false;
 function cloudInit(){
   if(typeof firebase==='undefined'){return;}
   try{firebase.initializeApp(firebaseConfig);_fbAuth=firebase.auth();_fbDb=firebase.firestore();}catch(e){return;}
-  // دفع تلقائي عند أي حفظ محلي
-  const _set=localStorage.setItem.bind(localStorage);
-  localStorage.setItem=function(k,v){_set(k,v);if(_fbUser&&SYNC_KEYS.indexOf(k)>=0)schedulePush();};
   _fbAuth.onAuthStateChanged(function(u){
     _fbUser=u||null;updateCloudUI();
     if(u&&!_pulled){_pulled=true;cloudPull();}
@@ -3539,7 +3546,7 @@ function recordLogin(u){
 function updateCloudUI(){
   const st=document.getElementById('cloudStatus'),b=document.getElementById('cloudBtn'),s=document.getElementById('cloudSyncBtn'),o=document.getElementById('cloudOutBtn');
   if(!st)return;
-  if(_fbUser){st.textContent='مسجّل الدخول: '+(_fbUser.email||'')+' — المزامنة مفعّلة.';st.classList.add('on');
+  if(_fbUser){const _ls=+(localStorage.getItem('delbaz_eps_lastsync')||0),_er=localStorage.getItem('delbaz_eps_syncerr');st.textContent='مسجّل الدخول: '+(_fbUser.email||'')+' — المزامنة مفعّلة'+(_ls?' · آخر مزامنة: '+_fmtSnap(_ls):'')+(_er&&!_ls?' · ⚠️ '+_er:'')+'.';st.classList.add('on');
     if(b)b.style.display='none';if(s)s.style.display='flex';if(o)o.style.display='block';}
   else{st.textContent='غير مسجّل الدخول — البيانات محفوظة على هذا الجهاز فقط.';st.classList.remove('on');
     if(b)b.style.display='flex';if(s)s.style.display='none';if(o)o.style.display='none';}
@@ -3591,30 +3598,172 @@ function deleteLogin(id,email){
     toast('✓ تم حذف السجل'); loadStats();
   }).catch(function(e){ toast('تعذّر الحذف: '+(e.code||'')); });
 }
-function schedulePush(){clearTimeout(_pushTimer);_pushTimer=setTimeout(cloudPush,1500);}
+// ===== حماية البيانات: لا يُمحى أي عمل مهما كان =====
+// (1) كل حفظ محلي يُوسَم بوقته (لكل مفتاح) ليُعرف الأحدث عند المزامنة
+// (2) نسخ تلقائية محلية (IndexedDB) قبل التحديث وقبل أي استبدال وبشكل يومي
+// (3) المزامنة لا تستبدل عملاً محلياً أحدث، وتحتفظ بنسخة الطرف الخاسر
+const _rawSet=localStorage.setItem.bind(localStorage);
+let _ts={};try{_ts=JSON.parse(localStorage.getItem('delbaz_eps_ts')||'{}')||{};}catch(e){_ts={};}
+function _saveTs(){try{_rawSet('delbaz_eps_ts',JSON.stringify(_ts));}catch(e){}}
+localStorage.setItem=function(k,v){
+  _rawSet(k,v);
+  if(SYNC_KEYS.indexOf(k)>=0){_ts[k]=Date.now();_saveTs();schedulePush();}
+};
+function _isEmptyVal(v){return v==null||v===''||v==='{}'||v==='[]'||v==='null';}
+function _collectLocal(){const o={};SYNC_KEYS.forEach(function(k){const v=localStorage.getItem(k);if(v!=null)o[k]=v;});return o;}
+function _sig(str){let h=0;for(let i=0;i<str.length;i+=97){h=(h*31+str.charCodeAt(i))|0;}return str.length+':'+h;}
+function _idb(){return new Promise(function(res,rej){
+  if(!window.indexedDB){rej('no idb');return;}
+  const r=indexedDB.open('smartpe_safety',1);
+  r.onupgradeneeded=function(){r.result.createObjectStore('snaps',{keyPath:'id',autoIncrement:true});};
+  r.onsuccess=function(){res(r.result);};r.onerror=function(){rej(r.error);};});}
+function _idbAll(){return _idb().then(function(db){return new Promise(function(res,rej){
+  const q=db.transaction('snaps','readonly').objectStore('snaps').getAll();
+  q.onsuccess=function(){res(q.result||[]);};q.onerror=function(){rej(q.error);};});});}
+function _idbGet(id){return _idb().then(function(db){return new Promise(function(res,rej){
+  const q=db.transaction('snaps','readonly').objectStore('snaps').get(id);
+  q.onsuccess=function(){res(q.result);};q.onerror=function(){rej(q.error);};});});}
+// يلتقط نسخة الآن (متزامناً) ثم يخزّنها؛ يتجاهل المكرّر تماماً
+function snapPut(label,dataObj){
+  const data=dataObj||_collectLocal();
+  const raw=JSON.stringify(data);
+  if(!data.delbaz_eps_classes||_isEmptyVal(data.delbaz_eps_classes))return Promise.resolve(false);
+  const sig=_sig(raw);
+  let nc=0;try{nc=(JSON.parse(data.delbaz_eps_classes)||[]).length;}catch(e){}
+  return _idb().then(function(db){return _idbAll().then(function(all){
+    if(all.length&&all[all.length-1].sig===sig&&!/قبل/.test(label))return false;
+    return new Promise(function(res,rej){
+      const tx=db.transaction('snaps','readwrite'),st=tx.objectStore('snaps');
+      st.add({t:Date.now(),label:label,ver:APP_VERSION,sig:sig,nc:nc,size:raw.length,data:data});
+      // احتفظ بآخر 25 نسخة فقط
+      const extra=all.length+1-25;
+      for(let i=0;i<extra;i++)st.delete(all[i].id);
+      tx.oncomplete=function(){try{_rawSet('delbaz_eps_lastsnap',String(Date.now()));_rawSet('delbaz_eps_lastsnapsig',sig);}catch(e){}res(true);};
+      tx.onerror=function(){rej(tx.error);};
+    });});}).catch(function(){return false;});
+}
+function safetyStartup(){
+  try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}
+  try{
+    const lastVer=localStorage.getItem('delbaz_eps_lastver');
+    let did=false;
+    if(lastVer&&lastVer!==APP_VERSION){snapPut('قبل التحديث إلى '+APP_VERSION+' (من '+lastVer+')');did=true;}
+    else if(!lastVer){snapPut('أول تشغيل بعد تفعيل الحماية');did=true;}
+    _rawSet('delbaz_eps_lastver',APP_VERSION);
+    const last=+(localStorage.getItem('delbaz_eps_lastsnap')||0);
+    if(!did&&Date.now()-last>20*3600*1000)snapPut('نسخة يومية');
+  }catch(e){}
+  document.addEventListener('visibilitychange',function(){
+    if(document.visibilityState!=='hidden')return;
+    try{
+      const last=+(localStorage.getItem('delbaz_eps_lastsnap')||0);
+      if(Date.now()-last<15*60*1000)return;
+      if(_sig(JSON.stringify(_collectLocal()))===localStorage.getItem('delbaz_eps_lastsnapsig'))return;
+      snapPut('نسخة تلقائية');
+    }catch(e){}
+  });
+}
+function _fmtSnap(t){const d=new Date(t),p=n=>String(n).padStart(2,'0');return p(d.getDate())+'/'+p(d.getMonth()+1)+'/'+d.getFullYear()+' '+p(d.getHours())+':'+p(d.getMinutes());}
+function renderSnaps(){
+  const box=document.getElementById('snapBox');if(!box)return;
+  _idbAll().then(function(all){
+    if(!all.length){box.innerHTML='<div class="settings-note">لا توجد نسخ تلقائية بعد؛ ستُنشأ تلقائياً (يومياً وقبل كل تحديث ومزامنة).</div>';return;}
+    box.innerHTML=all.slice().reverse().map(function(x){
+      return '<div class="cm-row" style="gap:6px"><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:800;color:var(--navy)">'+esc2(x.label)+'</div>'+
+        '<div style="font-size:10.5px;color:var(--muted)">'+_fmtSnap(x.t)+' · '+x.nc+' قسم · '+Math.round(x.size/1024)+' ك.ب</div></div>'+
+        '<button class="cm-ex on" onclick="restoreSnap('+x.id+')">استرجاع</button></div>';
+    }).join('');
+  }).catch(function(){box.innerHTML='<div class="settings-note">تعذّر فتح النسخ التلقائية على هذا المتصفح.</div>';});
+}
+function restoreSnap(id){
+  _idbGet(id).then(function(x){
+    if(!x||!x.data){toast('⚠️ النسخة غير موجودة');return;}
+    if(!confirm('استرجاع نسخة «'+x.label+'» ('+_fmtSnap(x.t)+')؟\nتُحفَظ بياناتك الحالية أولاً في نسخة تلقائية، فلا يضيع شيء.'))return;
+    snapPut('قبل الاستعادة').then(function(){
+      SYNC_KEYS.forEach(function(k){if(x.data[k]!=null)localStorage.setItem(k,x.data[k]);});
+      toast('✓ تم الاسترجاع — سيُعاد تحميل التطبيق');
+      setTimeout(function(){location.reload();},900);
+    });
+  });
+}
+function _gz(str){return Promise.resolve().then(function(){
+  const cs=new CompressionStream('gzip'),w=cs.writable.getWriter();w.write(new TextEncoder().encode(str));w.close();
+  return new Response(cs.readable).arrayBuffer();}).then(function(buf){
+  const u=new Uint8Array(buf);let bin='';for(let i=0;i<u.length;i+=0x8000)bin+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(bin);});}
+function _gunz(b64){return Promise.resolve().then(function(){
+  const bin=atob(b64),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
+  const ds=new DecompressionStream('gzip'),w=ds.writable.getWriter();w.write(u);w.close();
+  return new Response(ds.readable).text();}).then(function(t){return JSON.parse(t);});}
+let _pullDone=false,_syncErrShown=false;
+function schedulePush(){if(!_fbUser||!_pullDone)return;clearTimeout(_pushTimer);_pushTimer=setTimeout(cloudPush,1500);}
 function cloudPush(){
-  if(!_fbUser||!_fbDb)return;
-  const data={};SYNC_KEYS.forEach(function(k){const v=localStorage.getItem(k);if(v!=null)data[k]=v;});
-  _fbDb.collection('teachers').doc(_fbUser.uid).set({data:data,updatedAt:Date.now(),email:_fbUser.email||''}).catch(function(){});
+  if(!_fbUser||!_fbDb||!_pullDone)return Promise.resolve();
+  const data=_collectLocal();
+  const raw=JSON.stringify(data);
+  const base={ts:_ts,updatedAt:Date.now(),email:_fbUser.email||''};
+  const build=(raw.length>400000&&typeof CompressionStream!=='undefined')
+    ?_gz(raw).then(function(z){return Object.assign({z:z},base);})
+    :Promise.resolve(Object.assign({data:data},base));
+  return build.then(function(doc){
+    return _fbDb.collection('teachers').doc(_fbUser.uid).set(doc);
+  }).then(function(){
+    try{_rawSet('delbaz_eps_lastsync',String(Date.now()));}catch(e){}
+    _syncErrShown=false;updateCloudUI();
+  }).catch(function(e){
+    try{_rawSet('delbaz_eps_syncerr',(e&&e.code)||'خطأ');}catch(_){}
+    if(!_syncErrShown){_syncErrShown=true;toast('⚠️ تعذّرت المزامنة السحابية ('+((e&&e.code)||'')+') — بياناتك محفوظة على الجهاز؛ صدّر نسخة احتياطية');}
+    updateCloudUI();
+  });
 }
-function cloudPushNow(){if(!_fbUser){toast('سجّل الدخول أولاً');return;}cloudPush();cloudPull();toast('🔄 جارٍ المزامنة...');}
+function cloudPushNow(){if(!_fbUser){toast('سجّل الدخول أولاً');return;}toast('🔄 جارٍ المزامنة...');cloudPull().then(function(){return cloudPush();});}
 function cloudPull(){
-  if(!_fbUser||!_fbDb)return;
-  // امنع التكرار: الجلب مرة واحدة فقط لكل جلسة
+  if(!_fbUser||!_fbDb)return Promise.resolve();
   let already='';try{already=sessionStorage.getItem('delbaz_pulled')||'';}catch(e){}
-  _fbDb.collection('teachers').doc(_fbUser.uid).get().then(function(doc){
-    if(doc.exists&&doc.data()&&doc.data().data){
-      const d=doc.data().data;let changed=false;
-      SYNC_KEYS.forEach(function(k){if(d[k]!=null&&d[k]!==localStorage.getItem(k)){localStorage.setItem(k,d[k]);changed=true;}});
-      if(changed && already!==_fbUser.uid){
-        try{sessionStorage.setItem('delbaz_pulled',_fbUser.uid);}catch(e){}
-        toast('✓ تم جلب بياناتك من السحابة');setTimeout(function(){location.reload();},900);
-      }else{
-        try{sessionStorage.setItem('delbaz_pulled',_fbUser.uid);}catch(e){}
-      }
-    }else{cloudPush();}
-  }).catch(function(){});
+  return _fbDb.collection('teachers').doc(_fbUser.uid).get().then(function(doc){
+    if(!doc.exists||!doc.data()){_pullDone=true;return cloudPush();}
+    const o=doc.data();
+    const getData=o.data?Promise.resolve(o.data):(o.z?_gunz(o.z):Promise.resolve(null));
+    return getData.then(function(d){
+      if(!d){_pullDone=true;return;}
+      const cts=o.ts||{}, cUp=o.updatedAt||0;
+      const take=[], keepLocal=[]; let conflict=false;
+      SYNC_KEYS.forEach(function(k){
+        const c=d[k], l=localStorage.getItem(k);
+        if(c==null){if(l!=null&&!_isEmptyVal(l))keepLocal.push(k);return;}
+        if(l===c)return;
+        if(_isEmptyVal(l)){take.push(k);return;}
+        if(_isEmptyVal(c)){keepLocal.push(k);return;}
+        conflict=true;
+        const tl=_ts[k]||0, tc=cts[k]||0;
+        // محلي بلا وسم (من نسخة قديمة) = عمل لم يُزامَن بعد → له الأولوية دائماً
+        let cloudWins;
+        if(!tl)cloudWins=false;
+        else if(tc)cloudWins=tc>tl;
+        else cloudWins=cUp>tl;
+        (cloudWins?take:keepLocal).push(k);
+      });
+      // احتفظ بنسخة الطرفين قبل أي تغيير
+      const saves=[];
+      if(conflict||take.length){saves.push(snapPut('قبل المزامنة (نسختك المحلية)'));}
+      if(conflict){saves.push(snapPut('نسخة السحابة عند التعارض',d));}
+      return Promise.all(saves).then(function(){
+        take.forEach(function(k){_rawSet(k,d[k]);_ts[k]=cts[k]||cUp||Date.now();});
+        _saveTs();
+        _pullDone=true;
+        const changed=take.length>0;
+        if(changed&&already!==_fbUser.uid){
+          try{sessionStorage.setItem('delbaz_pulled',_fbUser.uid);}catch(e){}
+          if(keepLocal.length)cloudPush();
+          toast('✓ تم دمج بياناتك مع السحابة (الأحدث يُحفَظ)');setTimeout(function(){location.reload();},900);
+        }else{
+          try{sessionStorage.setItem('delbaz_pulled',_fbUser.uid);}catch(e){}
+          if(keepLocal.length)cloudPush();
+        }
+      });
+    });
+  }).catch(function(){/* فشل الجلب: لا نكتب فوق السحابة */});
 }
+try{safetyStartup();}catch(e){}
 try{cloudInit();}catch(e){}
 
 loadSettings();loadClasses();loadSchedule();try{const u=localStorage.getItem('delbaz_eps_unit');if(u)unitPlan=JSON.parse(u);}catch(e){}try{const mk=localStorage.getItem('delbaz_eps_marks');if(mk)diagMarks=JSON.parse(mk);}catch(e){}try{const cc=localStorage.getItem('delbaz_eps_crit');if(cc)customCrit=JSON.parse(cc);}catch(e){}try{const ls=localStorage.getItem('delbaz_eps_lessons');if(ls)lessonsSaved=JSON.parse(ls);}catch(e){}try{const li=localStorage.getItem('delbaz_eps_lessoninfo');if(li)lessonInfo=JSON.parse(li);}catch(e){}try{const ts=localStorage.getItem('delbaz_eps_terms');if(ts)termSports=JSON.parse(ts);}catch(e){}try{const dr=localStorage.getItem('delbaz_eps_drills');if(dr)drillEdits=JSON.parse(dr);}catch(e){}try{const jn=localStorage.getItem('delbaz_eps_dailylogs');if(jn)dailyLogs=JSON.parse(jn);}catch(e){}cur=SPORTS.team.find(s=>s.id===termRec().team)||SPORTS.team[0];renderSubs();renderTermPick();render();initTab2();
