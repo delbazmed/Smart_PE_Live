@@ -998,8 +998,13 @@ body.dark .qr-link{background:#10202c}
 <script>
 let students=["أحمد","عمر","سارة","فاطمة","يوسف","ليلى","كريم","نور","رضا","وليد"]; // active roster (default sample)
 // ===== إصدار التطبيق وسجل التحديثات =====
-const APP_VERSION='3.4';
+const APP_VERSION='3.5';
 const CHANGELOG=[
+  {v:'الإصدار 3.5', items:[
+    'ربط صارم بين الهدف الخاص والتمارين: تُخزَّن مهارة الهدف عند توليد الوحدة، فتُجلب تمارين نفس المهارة مهما اختلف مستوى القسم أو مستوى التشخيص.',
+    'حصص التقويم (التشخيصي، التكويني، التحصيلي) لها تمارين تقويمية خاصة بها بدل تمارين معيار غير مقصود.',
+    'تصحيح جدول المعايير للسنة الثالثة ثانوي. المذكرات المحفوظة سابقاً: اضغط «استرجاع النموذج» لتحديث تمارينها.'
+  ]},
   {v:'الإصدار 3.4', items:[
     'الدفتر اليومي يُملأ من المذكرة: الأهداف الإجرائية = هدف التحضيري (1) ثم عناوين تمارين المرحلة الرئيسية مرقّمة، وآخرها هدف الختامي.',
     'الدفتر يتبع آخر تعديل في المذكرة المحفوظة مباشرة، ويُولَّد تلقائياً بنفس الترتيب إن لم تُحفظ المذكرة بعد.'
@@ -1462,41 +1467,81 @@ const DRILLS={
     _cool:'فضاء هادئ، حصائر عند الحاجة.'
   }
 };
+// تمارين حصص التقويم (لا ترتبط بمعيار واحد): {s} = اسم النشاط
+DRILLS.eval={
+  diag:{
+    team:[
+      {d:'لعب مصغّر تشخيصي في {s}',e:'لعب حر بقواعد مبسّطة لإظهار المكتسبات القبلية دون توجيه.',o:'أفواج متكافئة، ميدان مصغّر، الأستاذ يلاحظ ويسجّل على شبكة الملاحظة.'},
+      {d:'وضعيات فردية لقياس المهارات الأساسية في {s}',e:'أداء كل تلميذ للمهارات الأساسية ويُسجَّل المتحكّم وغير المتحكّم.',o:'ورشات بعدد المعايير، تلميذ يؤدي وآخر يلاحظ.'},
+      {d:'تقسيم الأفواج حسب مستوى التحكم',e:'تصنيف التلاميذ (متحكم / متوسط / غير متحكم) لبناء أفواج متجانسة.',o:'قائمة الأسماء، شبكة الملاحظة، أطواق أو أشرطة ملونة.'}],
+    indiv:[
+      {d:'أداء تجريبي أول في {s}',e:'محاولة أولى بدون توجيه لرصد النقائص عند كل تلميذ.',o:'مسار الإنجاز، تلميذ يؤدي وآخر يلاحظ، تسجيل النتائج.'},
+      {d:'وضعيات استكشافية حول معايير {s}',e:'أداء مبسّط لكل معيار من المعايير الخمسة لتحديد مواطن الضعف.',o:'ورشات بعدد المعايير، شبكة ملاحظة بيد الأستاذ.'},
+      {d:'تسجيل الأداء وتقسيم الأفواج',e:'تدوين القياسات وتصنيف التلاميذ حسب مستوى التحكم.',o:'ميقاتية، شريط قياس، قائمة الأسماء.'}]
+  },
+  formative:{
+    team:[
+      {d:'لعب مصغّر مُقوَّم في {s}',e:'لعب بقواعد ثابتة مع ملاحظة المعايير المستهدفة في الوحدة.',o:'أفواج متكافئة، شبكة ملاحظة المعايير، ميدان مصغّر.'},
+      {d:'ورشات قياس المعايير المدروسة في {s}',e:'اختبار قصير لكل معيار درسناه لقياس نسبة التحكم.',o:'ورشات مرقمة، تلميذ يؤدي وآخر يسجّل.'},
+      {d:'معالجة النقائص بأفواج الدعم',e:'إعادة تدريب المتعثّرين على المعيار الأضعف مع توجيه فردي.',o:'فوج دعم مع الأستاذ، وفوج استقلالي بين التلاميذ المتحكمين.'}],
+    indiv:[
+      {d:'محاولات مقيَّمة في {s}',e:'أداء كل تلميذ محاولتين مع تسجيل أحسن نتيجة.',o:'مسار الإنجاز، ميقاتية، تلميذ يؤدي وآخر يسجّل.'},
+      {d:'ورشات قياس المعايير المدروسة في {s}',e:'اختبار قصير لكل معيار درسناه لقياس نسبة التحكم.',o:'ورشات مرقمة، بطاقة متابعة لكل تلميذ.'},
+      {d:'معالجة النقائص بأفواج الدعم',e:'إعادة تدريب المتعثّرين على المعيار الأضعف مع توجيه فردي.',o:'فوج دعم مع الأستاذ، وفوج استقلالي بين التلاميذ المتحكمين.'}]
+  },
+  sum:{
+    team:[
+      {d:'وضعية إدماجية: مباراة كاملة في {s}',e:'توظيف كل المعايير المدروسة في لعب حقيقي بقواعده القانونية.',o:'فريقان متكافئان، حكم من التلاميذ، شبكة تقويم بيد الأستاذ.'},
+      {d:'اختبار إنجاز المهارات الأساسية في {s}',e:'أداء كل تلميذ المهارات الأساسية وفق سلّم التنقيط.',o:'ورشات مرقمة، شبكة تنقيط، قائمة الأسماء.'},
+      {d:'تقويم نهائي وإسناد العلامات',e:'تحويل نتائج الأداء إلى علامات حسب المعايير المعتمدة.',o:'بطاقة التنقيط، ملخص النتائج مع التلاميذ.'}],
+    indiv:[
+      {d:'اختبار أداء رسمي في {s}',e:'أداء كل تلميذ في ظروف رسمية، تُسجَّل أحسن محاولة.',o:'مسار الإنجاز، ميقاتية أو شريط قياس، حكم ومسجّل.'},
+      {d:'وضعية إدماجية تجمع معايير {s}',e:'أداء كامل للحركة بتوظيف المعايير المدروسة جميعها.',o:'مسار الإنجاز، شبكة تقويم بيد الأستاذ.'},
+      {d:'تقويم نهائي وإسناد العلامات',e:'تحويل نتائج الأداء إلى علامات حسب المعايير المعتمدة.',o:'بطاقة التنقيط، ملخص النتائج مع التلاميذ.'}]
+  }
+};
 // جدول الربط: رقم المعيار (0..4) ← المهارة التقنية، حسب المستوى (المعايير الرسمية تختلف نصاً وترتيباً بين المستويات)
 const CRITMAP={
   sprint:{
     'الأولى ثانوي':['react','lean','stride','coord','finish'],
     'الثانية ثانوي':['react','line','foot','coord','finish'],
+    'الثالثة ثانوي':['react','line','foot','coord','finish'],
     _def:['react','lean','stride','coord','finish']
   },
   volley:{
     'الأولى ثانوي':['pass_lo','pass_hi','place','fingers','dig'],
     'الثانية ثانوي':['place','pass_lo','pass_hi','serve','spike'],
+    'الثالثة ثانوي':['place','pass_lo','pass_hi','serve','spike'],
     _def:['serve','pass_hi','pass_lo','spike','place']
   },
   hand:{
     'الأولى ثانوي':['drib','steps','pass','catch','spread'],
     'الثانية ثانوي':['catch','steps','def','combo','shootjump'],
+    'الثالثة ثانوي':['catch','pass','def','combo','shootjump'],
     _def:['pass','drib','shootstand','shootjump','spread']
   },
   basket:{
     'الأولى ثانوي':['drib','pivot','pass','layup','def'],
     'الثانية ثانوي':['dribchange','pass','moveoff','shootboard','def'],
+    'الثالثة ثانوي':['dribchange','pass','moveoff','shootboard','def'],
     _def:['drib','pass','layup','shootstand','def']
   },
   jump:{
     'الأولى ثانوي':['run','board','takeoff','flight','land'],
     'الثانية ثانوي':['accel','takeoff','tuck','arms','extend'],
+    'الثالثة ثانوي':['accel','takeoff','tuck','arms','extend'],
     _def:['run','board','takeoff','flight','extend']
   },
   triple:{
     'الأولى ثانوي':['seq','hop','balance','link','trunk'],
     'الثانية ثانوي':['seq','quick','balance','swingleg','dblarm'],
+    'الثالثة ثانوي':['seq','quick','balance','swingleg','dblarm'],
     _def:['seq','hop','balance','link','trunk']
   },
   shot:{
     'الأولى ثانوي':['hold','ready','chain','fingers','gaze'],
     'الثانية ثانوي':['hold','ready','drive','angle','brake'],
+    'الثالثة ثانوي':['hold','ready','drive','angle','brake'],
     _def:['hold','glide','chain','angle','brake']
   }
 };
@@ -1751,13 +1796,13 @@ function rebuildUnitSilently(){
   const learn=5;
   // توزيع الأهداف على الحصص مع الاحتفاظ برقم المعيار لكل هدف (أساس جلب التمارين)
   const spread=(arr)=>{
-    if(!arr.length)return Array(learn).fill({g:'—',c:-1});
-    const out=[];for(let k=0;k<learn;k++){const p=Math.floor(k*arr.length/learn);out.push({g:arr[p].goal,c:(arr[p].c!=null?arr[p].c:p)});}
+    if(!arr.length)return Array(learn).fill({g:'—',c:-1,s:''});
+    const out=[];for(let k=0;k<learn;k++){const p=Math.floor(k*arr.length/learn);out.push({g:arr[p].goal,c:(arr[p].c!=null?arr[p].c:p),s:arr[p].sk||''});}
     return out;};
   const tD=spread(tG),iD=spread(iG);let li=0;
   if(diagStore.team)unitPlan.teamSport=diagStore.team.sportName;
   if(diagStore.indiv)unitPlan.indivSport=diagStore.indiv.sportName;
-  unitPlan.rows.forEach(r=>{if(r.cls==='learn'){r.t=tD[li].g;r.i=iD[li].g;r.tc=tD[li].c;r.ic=iD[li].c;li++;}});
+  unitPlan.rows.forEach(r=>{if(r.cls==='learn'){r.t=tD[li].g;r.i=iD[li].g;r.tc=tD[li].c;r.ic=iD[li].c;r.ts=tD[li].s;r.is=iD[li].s;li++;}});
   try{localStorage.setItem('delbaz_eps_unit',JSON.stringify(unitPlan));}catch(e){}
   // حدّث جدول الوحدة المعروض إن كان مفتوحاً
   if(document.getElementById('tab2')&&document.getElementById('tab2').classList.contains('on')){
@@ -1813,9 +1858,9 @@ function save(silent){
   const eT=extractFor(teamSport), eI=extractFor(indivSport);
   // تخزين أهداف النشاطين الخمسة كاملةً (ليتزامن أي تعديل معيار مع الوحدة والمذكرة والدفتر)
   diagStore.team={sportId:teamSport.id,sportName:teamSport.name,
-    goals:eT.crit.map((label,c)=>({c:c,crit:label,goal:goalFor(teamSport,c),fail:eT.fr[c]}))};
+    goals:eT.crit.map((label,c)=>({c:c,sk:skillFor(teamSport.id,document.getElementById('mLevel').value,c),crit:label,goal:goalFor(teamSport,c),fail:eT.fr[c]}))};
   diagStore.indiv={sportId:indivSport.id,sportName:indivSport.name,
-    goals:eI.crit.map((label,c)=>({c:c,crit:label,goal:goalFor(indivSport,c),fail:eI.fr[c]}))};
+    goals:eI.crit.map((label,c)=>({c:c,sk:skillFor(indivSport.id,document.getElementById('mLevel').value,c),crit:label,goal:goalFor(indivSport,c),fail:eI.fr[c]}))};
   const _cn=(classes.find(c=>c.id==document.getElementById('mClass').value)||{}).name||'—';
   document.getElementById('repMeta').innerHTML=[document.getElementById('mSchool').value,'الأستاذ: '+document.getElementById('mTeacher').value,document.getElementById('mLevel').value,'القسم: '+_cn,curTerm(),'النشاطان: '+teamSport.name+' + '+indivSport.name,'التاريخ: '+new Date().toLocaleDateString('fr-FR')].map(x=>`<span>${x}</span>`).join('');
   const sumLine=e=>`نشاط <b>${e.sportObj.name}</b>: ${e.m} متحكم، ${e.med} متوسط، ${e.no} غير متحكم${e.def.length?`؛ أبرز النقائص: <b>${e.def.map(d=>d.label).join('، ')}</b>`:'؛ لا نقائص رئيسية'}.`;
@@ -1942,9 +1987,9 @@ function goalsFor(catKey){
   // use diagnostic-extracted goals if same sport diagnosed, else fall back to sport's full goal set
   if(diagStore[catKey]&&diagStore[catKey].sportId===sel){
     const gs=diagStore[catKey].goals;
-    return {sport,list:gs.map(g=>g.goal),idx:gs.map((g,n)=>(g.c!=null?g.c:n)),fromDiag:true};
+    return {sport,list:gs.map(g=>g.goal),idx:gs.map((g,n)=>(g.c!=null?g.c:n)),sks:gs.map((g,n)=>g.sk||skillFor(sport.id,document.getElementById('mLevel').value,(g.c!=null?g.c:n))),fromDiag:true};
   }
-  return {sport,list:sport.goals.slice(),idx:sport.goals.map((g,n)=>n),fromDiag:false};
+  return {sport,list:sport.goals.slice(),idx:sport.goals.map((g,n)=>n),sks:sport.goals.map((g,n)=>((CRITMAP[sport.id]||{})._def||[])[n]||''),fromDiag:false};
 }
 function refreshInject(){
   const t=goalsFor('team'),i=goalsFor('indiv');
@@ -1958,14 +2003,14 @@ function generateUnit(){
   // 5 learning sessions (02,03,04,06,07) carry the distributed goals
   const learn=5;
   // لكل حصة تعليمية: نص الهدف + رقم المعيار الذي جاء منه (أساس جلب التمارين آلياً)
-  const spread=(arr,idx)=>{
-    if(!arr.length)return Array(learn).fill({g:'—',c:-1});
-    const out=[];for(let i=0;i<learn;i++){const p=Math.floor(i*arr.length/learn);out.push({g:arr[p],c:((idx&&idx[p]!=null)?idx[p]:p)});}
+  const spread=(arr,idx,sks)=>{
+    if(!arr.length)return Array(learn).fill({g:'—',c:-1,s:''});
+    const out=[];for(let i=0;i<learn;i++){const p=Math.floor(i*arr.length/learn);out.push({g:arr[p],c:((idx&&idx[p]!=null)?idx[p]:p),s:(sks&&sks[p])||''});}
     return out;};
-  const tDist=spread(tg,teamD.idx),iDist=spread(ig,indivD.idx);
+  const tDist=spread(tg,teamD.idx,teamD.sks),iDist=spread(ig,indivD.idx,indivD.sks);
   let li=0; // learning-session index
-  const learnRow=(n)=>{const t=tDist[li].g,i=iDist[li].g,tc=tDist[li].c,ic=iDist[li].c;li++;return {n,type:'حصة تعليمية '+String(li).padStart(2,'0'),cls:'learn',mid:false,
-    t,i,tc,ic,c:`وضعيات تعلمية وتمارين تطبيقية حول الهدف، تثبيت تدريجي مع توجيهات تصحيحية ولعب مصغّر/توقيت مرحلي.`};};
+  const learnRow=(n)=>{const t=tDist[li].g,i=iDist[li].g,tc=tDist[li].c,ic=iDist[li].c,ts=tDist[li].s,is=iDist[li].s;li++;return {n,type:'حصة تعليمية '+String(li).padStart(2,'0'),cls:'learn',mid:false,
+    t,i,tc,ic,ts,is,c:`وضعيات تعلمية وتمارين تطبيقية حول الهدف، تثبيت تدريجي مع توجيهات تصحيحية ولعب مصغّر/توقيت مرحلي.`};};
   const rows=[
     {n:'01',type:'تقويم تشخيصي',cls:'diag',mid:false,t:'تشخيص المكتسبات القبلية في النشاط الجماعي.',i:'تشخيص المكتسبات القبلية في النشاط الفردي.',c:'تقويم تشخيصي وتقسيم الأفواج حسب المستوى؛ وضعيات استكشافية وتسجيل النقائص لبناء الوحدة.'},
     learnRow('02'),learnRow('03'),learnRow('04'),
@@ -1983,7 +2028,7 @@ function generateUnit(){
       <td><textarea>${r.i}</textarea></td>
       <td><textarea>${r.c}</textarea></td></tr>`).join('');
   // store globally for journal + lesson plan
-  unitPlan={teamSport:teamD.sport.name,indivSport:indivD.sport.name,rows:rows.map(r=>({n:r.n,type:r.type,cls:r.cls,t:r.t,i:r.i,c:r.c}))};
+  unitPlan={teamSport:teamD.sport.name,indivSport:indivD.sport.name,rows:rows.map(r=>({n:r.n,type:r.type,cls:r.cls,t:r.t,i:r.i,c:r.c,tc:r.tc,ic:r.ic,ts:r.ts,is:r.is}))};
   try{localStorage.setItem('delbaz_eps_unit',JSON.stringify(unitPlan));}catch(e){}
   document.getElementById('unitPlaceholder').style.display='none';
   document.getElementById('unitOut').style.display='block';
@@ -2568,16 +2613,14 @@ function lessonData(k,classId){
   // 2) لا مذكرة محفوظة: نبني نفس ما تولّده المذكرة تلقائياً (هدف التحضيري + عناوين التمارين + هدف الختامي)
   const r=unitPlan.rows[k]; if(!r)return null;
   const cls=classes.find(c=>c.id==cid), lvl=cls?cls.grade:'';
-  const titles=function(sport,ci,fallback){
-    const l=drillsFor(sport,ci,'main',lvl);
+  const titles=function(sport,side,fallback){
+    const l=rowDrills(sport,r,side,lvl);
     return (l&&l.length)?l.map(x=>x.d):[fallback];
   };
-  const iCi=(r.ic!=null)?r.ic:ciFromText(_sportBy(unitPlan.indivSport),lvl,r.i);
-  const tCi=(r.tc!=null)?r.tc:ciFromText(_sportBy(unitPlan.teamSport),lvl,r.t);
   return {indivSport:unitPlan.indivSport,teamSport:unitPlan.teamSport,
     indivTarget:r.i,teamTarget:r.t,
-    act1Subs:[LP_PREP_OBJ].concat(titles(unitPlan.indivSport,iCi,r.i),[LP_COOL_OBJ]),
-    act2Subs:[LP_PREP_OBJ].concat(titles(unitPlan.teamSport,tCi,r.t),[LP_COOL_OBJ])};
+    act1Subs:[LP_PREP_OBJ].concat(titles(unitPlan.indivSport,'i',r.i),[LP_COOL_OBJ]),
+    act2Subs:[LP_PREP_OBJ].concat(titles(unitPlan.teamSport,'t',r.t),[LP_COOL_OBJ])};
 }
 function actCell(name,target,subs){
   // كل سطر هدف مستقل، ويُعرض مرقّماً 1. 2. 3.
@@ -2728,27 +2771,14 @@ function skillFor(sid,lvl,ci){
   const arr=m[levelKey(lvl)]||m._def;
   return arr[ci]||arr[0]||'';
 }
-// استرجاع رقم المعيار من نص الهدف (شبكة أمان للمذكرات المحفوظة قبل هذا التحديث)
-function ciFromText(sp,lvl,txt){
-  if(!sp||!txt)return -1;
-  const t=String(txt).trim(); if(!t||t==='—')return -1;
-  let i=sp.goals.indexOf(t); if(i>=0)return i;
-  const db=pedagogyDatabase[levelKey(lvl)]?.[sp.name];
-  for(let c=0;c<5;c++){
-    if(db&&db[c+1]&&db[c+1].target&&t.indexOf(String(db[c+1].target).trim())>=0)return c;
-    const cn=String(critNameFor(sp,lvl,c)).trim();
-    if(cn&&t.indexOf(cn)>=0)return c;
-  }
-  return -1;
-}
-function drillsFor(sportName,ci,phase,lvl){
+function drillsFor(sportName,ci,phase,lvl,skill){
   const sp=_sportBy(sportName); const sid=sp?sp.id:'';
   let base=null, slot=phase;
   if(phase==='warm') base=(DRILLS.warm[sid]||null);
   else if(phase==='cool'){ base=DRILLS.cool; }
   else {
     const set=DRILLS.main[sid]; if(!set)return null;
-    slot=skillFor(sid,lvl,(ci>=0?ci:0)); base=set[slot]||null;
+    slot=(skill&&set[skill])?skill:skillFor(sid,lvl,(ci>=0?ci:0)); base=set[slot]||null;
   }
   if(!base)return null;
   // طبّق تعديلاتك المحفوظة (مرتبطة بالمهارة لا برقم المعيار)
@@ -2757,6 +2787,51 @@ function drillsFor(sportName,ci,phase,lvl){
     if(!ov)return {d:x.d,e:x.e,o:x.o};
     return {d:ov.d,e:(ov.e!=null?ov.e:x.e),o:(ov.o!=null?ov.o:x.o)};
   });
+}
+
+// ===== الربط الصارم: الهدف ← المهارة ← التمارين =====
+// المهارة تُخزَّن مع الهدف لحظة توليده (مهما كان مستوى القسم)، وتُستنتج من النص للمذكرات القديمة
+function skillFromText(sp,txt){
+  if(!sp||!txt)return '';
+  const t=String(txt).trim(); if(!t||t==='—')return '';
+  const m=CRITMAP[sp.id]; if(!m)return '';
+  const i=sp.goals.indexOf(t); if(i>=0)return (m._def||[])[i]||'';
+  const ml=(document.getElementById('mLevel')||{}).value||'';
+  const lvls=[ml,'سنة أولى ثانوي','سنة ثانية ثانوي','سنة ثالثة ثانوي'];
+  for(let a=0;a<lvls.length;a++){
+    const L=lvls[a]; if(!L)continue;
+    const k=levelKey(L), arr=m[k]; if(!arr)continue;
+    const db=(pedagogyDatabase[k]||{})[sp.name];
+    for(let c=0;c<5;c++){
+      if(db&&db[c+1]&&db[c+1].target&&t.indexOf(String(db[c+1].target).trim())>=0)return arr[c];
+      const cn=String(critNameFor(sp,L,c)).trim();
+      if(cn&&t.indexOf(cn)>=0)return arr[c];
+    }
+  }
+  return '';
+}
+function rowSkill(sportName,r,side){
+  if(!r)return '';
+  const sk=r[side+'s']; if(sk)return sk;
+  return skillFromText(_sportBy(sportName),side==='t'?r.t:r.i);
+}
+// حصص التقويم (تشخيصي/تكويني/تحصيلي): تمارين تقويمية خاصة بها لا علاقة لها بمعيار بعينه
+function evalDrills(sportName,cls){
+  const sp=_sportBy(sportName); if(!sp)return null;
+  const kind=SPORTS.team.indexOf(sp)>=0?'team':'indiv';
+  const base=DRILLS.eval&&DRILLS.eval[cls]&&DRILLS.eval[cls][kind]; if(!base)return null;
+  const slot='eval_'+cls;
+  return base.map(function(x,n){
+    const f=function(v){return v==null?v:String(v).split('{s}').join(sp.name);};
+    const ov=drillEdits[drillKey(sp.id,'main',slot,n)];
+    if(!ov)return {d:f(x.d),e:f(x.e),o:f(x.o)};
+    return {d:ov.d,e:(ov.e!=null?ov.e:f(x.e)),o:(ov.o!=null?ov.o:f(x.o))};
+  });
+}
+// تمارين المرحلة الرئيسية لحصة معيّنة: تعليمية ← مهارة الهدف | تقويمية ← تمارين التقويم
+function rowDrills(sportName,r,side,lvl){
+  if(r&&r.cls!=='learn')return evalDrills(sportName,r.cls);
+  return drillsFor(sportName,0,'main',lvl,rowSkill(sportName,r,side));
 }
 function drillsHtml(list){
   if(!list||!list.length)return '';
@@ -2793,8 +2868,7 @@ function renderLesson(forceFresh){
   // رقم المعيار لهذه الحصة: من مخطّط الوحدة، وإن غاب (مذكرة قديمة) نستنتجه من نص الهدف
   const lLvl=document.getElementById('lLevel').value;
   const _rw=unitPlan?unitPlan.rows[k]:null;
-  const teamCi=(_rw&&_rw.tc!=null)?_rw.tc:ciFromText(_sportBy(teamSport),lLvl,teamObj);
-  const indivCi=(_rw&&_rw.ic!=null)?_rw.ic:ciFromText(_sportBy(indivSport),lLvl,indivObj);
+  const indivMain=rowDrills(indivSport,_rw,'i',lLvl), teamMain=rowDrills(teamSport,_rw,'t',lLvl);
   const baseComp=FINAL_COMP[document.getElementById('lLevel').value]||'';
   const indivLearn=(SPORTS.indiv.find(s=>s.name===indivSport)||{}).obj||'';
   const teamLearn=(SPORTS.team.find(s=>s.name===teamSport)||{}).obj||'';
@@ -2821,15 +2895,15 @@ function renderLesson(forceFresh){
          <td ${E}>استجابة التلاميذ وارتفاع وتيرة النشاط تدريجياً.</td></tr>
        <tr><td class="ph">الجزء الرئيسي<br><small>نشاط فردي (${esc(indivSport)})</small></td>
          <td ${E}>${esc(indivObj)}</td>
-         <td ${E}>${drillsHtml(drillsFor(indivSport,indivCi,'main',lLvl))||'وضعيات وتمارين تطبيقية متدرّجة حول الهدف مع توجيهات تقنية وتصحيح فردي.'}</td>
+         <td ${E}>${drillsHtml(indivMain)||'وضعيات وتمارين تطبيقية متدرّجة حول الهدف مع توجيهات تقنية وتصحيح فردي.'}</td>
          <td class="dur" ${E}>40 د</td>
-         <td ${E}>${condHtml(gearFor(indivSport,'main')||'عتاد النشاط الفردي، مسارات، شريط قياس.',drillsFor(indivSport,indivCi,'main',lLvl))}</td>
+         <td ${E}>${condHtml(gearFor(indivSport,'main')||'عتاد النشاط الفردي، مسارات، شريط قياس.',indivMain)}</td>
          <td ${E}>أداء الحركة وفق المؤشرات التقنية المطلوبة.</td></tr>
        <tr><td class="ph">الجزء الرئيسي<br><small>نشاط جماعي (${esc(teamSport)})</small></td>
          <td ${E}>${esc(teamObj)}</td>
-         <td ${E}>${drillsHtml(drillsFor(teamSport,teamCi,'main',lLvl))||'وضعيات لعب وتمارين تكتيكية مصغّرة ثم لعب جماعي مع تطبيق القواعد.'}</td>
+         <td ${E}>${drillsHtml(teamMain)||'وضعيات لعب وتمارين تكتيكية مصغّرة ثم لعب جماعي مع تطبيق القواعد.'}</td>
          <td class="dur" ${E}>40 د</td>
-         <td ${E}>${condHtml(gearFor(teamSport,'main')||'كرات، أهداف/شباك، ميدان مقسّم.',drillsFor(teamSport,teamCi,'main',lLvl))}</td>
+         <td ${E}>${condHtml(gearFor(teamSport,'main')||'كرات، أهداف/شباك، ميدان مقسّم.',teamMain)}</td>
          <td ${E}>التموقع الصحيح وفعالية التنفيذ في وضعية اللعب.</td></tr>
        <tr><td class="ph">الجزء الختامي</td>
          <td ${E}>${esc(LP_COOL_OBJ)}</td>
@@ -2887,8 +2961,7 @@ function _lessonSports(){
     indivSport:unitPlan?unitPlan.indivSport:'', teamSport:unitPlan?unitPlan.teamSport:'',
     indivObj:unitPlan?unitPlan.rows[k].i:'', teamObj:unitPlan?unitPlan.rows[k].t:'',
     lvl:document.getElementById('lLevel').value,
-    indivCi:(unitPlan&&unitPlan.rows[k].ic!=null)?unitPlan.rows[k].ic:-1,
-    teamCi:(unitPlan&&unitPlan.rows[k].tc!=null)?unitPlan.rows[k].tc:-1
+    row:unitPlan?unitPlan.rows[k]:null
   };
 }
 function _drCtx(){
@@ -2896,12 +2969,13 @@ function _drCtx(){
   const sport=(row===2)?s.teamSport:s.indivSport;
   const obj=(row===2)?s.teamObj:(row===1?s.indivObj:'');
   const sp=_sportBy(sport); const sid=sp?sp.id:'';
-  let ci=(row===2)?s.teamCi:(row===1?s.indivCi:-1);
-  if(ph==='main'&&ci<0) ci=ciFromText(sp,s.lvl,obj);
-  if(ph==='main'&&ci<0) ci=0;
-  return {row:row,ph:ph,sport:sport,obj:obj,sid:sid,ci:ci,lvl:s.lvl,
-          skill:(ph==='main'?skillFor(sid,s.lvl,ci):ph),
-          list:drillsFor(sport,ci,ph,s.lvl)};
+  const side=(row===2)?'t':'i';
+  let skill=ph, list;
+  if(ph==='main'){
+    if(s.row&&s.row.cls!=='learn'){skill='eval_'+s.row.cls; list=evalDrills(sport,s.row.cls);}
+    else{skill=rowSkill(sport,s.row,side)||skillFor(sid,s.lvl,0); list=drillsFor(sport,0,'main',s.lvl,skill);}
+  } else list=drillsFor(sport,-1,ph,s.lvl);
+  return {row:row,ph:ph,sport:sport,obj:obj,sid:sid,lvl:s.lvl,skill:skill,list:list};
 }
 function openDrills(){document.getElementById('drOv').classList.add('show');renderDrills();}
 function closeDrills(){document.getElementById('drOv').classList.remove('show');}
@@ -2913,7 +2987,7 @@ function renderDrills(){
     box.innerHTML=''; return;
   }
   info.style.display='block';
-  info.innerHTML='<b>'+esc(c.sport)+'</b>'+(c.ph==='main'?' · المعيار '+(c.ci+1)+': '+esc(critNameFor(_sportBy(c.sport),c.lvl,c.ci)):'')+
+  info.innerHTML='<b>'+esc(c.sport)+'</b>'+(c.ph==='main'&&c.obj?' · الهدف: '+esc(c.obj):'')+
                  '<br>عدّل أي تمرين ثم احفظه — يبقى محفوظاً في كل مذكراتك القادمة.';
   const lb='display:block;font-size:10px;font-weight:800;color:var(--mint-d);margin:5px 0 2px';
   box.innerHTML=c.list.map(function(x,n){
