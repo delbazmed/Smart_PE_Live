@@ -1,5 +1,5 @@
 // Smart _P.E — الدفتر البيداغوجي الذكي · Service Worker
-const CACHE = 'smart-pe-v31';
+const CACHE = 'smart-pe-v32';
 const ASSETS = [
   './',
   './index.html',
