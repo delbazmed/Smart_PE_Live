@@ -219,6 +219,11 @@ tfoot td.name{background:#e7edf4;color:var(--muted);font-size:10px}
 .cm-del{border:none;background:var(--red-soft);color:var(--red);width:30px;height:30px;border-radius:9px;
   cursor:pointer;font-size:14px;font-weight:800;flex-shrink:0}
 .cm-del:active{transform:scale(.9)}
+.cm-ex{border:1.5px solid var(--line);background:#fff;color:var(--muted);height:30px;padding:0 9px;border-radius:9px;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit}
+.cm-ex.on{background:var(--amber-soft,#fff3d6);border-color:var(--amber,#e0a100);color:var(--amber,#9a6b00)}
+.ex-row td{background:#f4f4f4;color:#888}
+.ex-row .ex-c{text-align:center;font-size:11px;font-style:italic}
+.ex-b{display:inline-block;font-size:9px;font-weight:800;background:#e8e8e8;color:#666;border-radius:6px;padding:1px 6px;margin-inline-start:4px}
 .cm-foot{padding:12px 15px;border-top:1px solid var(--line);flex-shrink:0;background:#fafcfe}
 .cm-warn{background:#fff4dd;color:#8a6d1b;border-radius:10px;padding:8px 11px;font-size:11px;
   font-weight:600;margin-bottom:10px;line-height:1.6}
@@ -996,10 +1001,17 @@ body.dark .qr-link{background:#10202c}
 </div>
 
 <script>
+let studentEx=[]; // موازٍ لـ students: 1 = معفى من التربية البدنية
+const isEx=function(i){return !!studentEx[i];};
+const activeCount=function(){let n=0;for(let i=0;i<students.length;i++)if(!studentEx[i])n++;return n;};
 let students=["أحمد","عمر","سارة","فاطمة","يوسف","ليلى","كريم","نور","رضا","وليد"]; // active roster (default sample)
 // ===== إصدار التطبيق وسجل التحديثات =====
-const APP_VERSION='3.5';
+const APP_VERSION='3.6';
 const CHANGELOG=[
+  {v:'الإصدار 3.6', items:[
+    'التلاميذ المعفون من التربية البدنية: زر «إعفاء» بجانب كل تلميذ في إدارة الفوج (✎).',
+    'المعفى لا تُسجَّل له نتائج في شبكة التقييم، ولا يدخل في نسب التحكم ولا في عدد المتحكمين/المتوسطين/غير المتحكمين ولا في التقرير. يظهر في PDF بعبارة «معفى».'
+  ]},
   {v:'الإصدار 3.5', items:[
     'ربط صارم بين الهدف الخاص والتمارين: تُخزَّن مهارة الهدف عند توليد الوحدة، فتُجلب تمارين نفس المهارة مهما اختلف مستوى القسم أو مستوى التشخيص.',
     'حصص التقويم (التشخيصي، التكويني، التحصيلي) لها تمارين تقويمية خاصة بها بدل تمارين معيار غير مقصود.',
@@ -1768,6 +1780,7 @@ function render(){
   const fresh=!saved; if(fresh)saved=[];
   document.getElementById('gBody').innerHTML=students.map((s,r)=>{
     if(!saved[r])saved[r]=[];
+    if(isEx(r))return `<tr class="ex-row"><td class="name">${s} <span class="ex-b">معفى</span></td><td colspan="${crit.length}" class="ex-c">معفى من التربية البدنية — لا تُسجَّل له نتائج</td><td class="score" id="sc${r}">—</td><td id="lv${r}">—</td></tr>`;
     const cells=crit.map((_,c)=>{
       let v=saved[r][c];
       if(v!==0&&v!==1){v=0;saved[r][c]=v;} // default new cells to 0
@@ -1818,13 +1831,14 @@ function flip(b){
   recalc();hideReport();
 }
 function failRates(){
-  const n=students.length,k=getCrit(cur).length,fr=[];
+  const n=Math.max(1,activeCount()),k=getCrit(cur).length,fr=[];
   for(let c=0;c<k;c++){let z=0;document.querySelectorAll(`.tg[data-c="${c}"]`).forEach(t=>{if(t.textContent.trim()==="0")z++;});fr.push(Math.round(z/n*100));}
   return fr;
 }
 function recalc(){
   const crit=getCrit(cur),n=students.length,k=crit.length;
   for(let r=0;r<n;r++){
+    if(isEx(r))continue;
     const tgs=document.querySelectorAll(`.tg[data-r="${r}"]`);let sum=0;tgs.forEach(t=>sum+=+t.textContent.trim());
     document.getElementById('sc'+r).textContent=sum+' / '+k;
     const ratio=sum/k,el=document.getElementById('lv'+r);
@@ -1843,10 +1857,10 @@ function extractFor(sportObj){
   const crit=getCrit(sportObj);
   const key=(document.getElementById('mClass').value||'sample')+'|'+sportObj.id;
   const saved=diagMarks[key]||[];
-  const n=students.length,k=crit.length,fr=[];
-  for(let c=0;c<k;c++){let z=0;for(let r=0;r<n;r++){const v=(saved[r]&&saved[r][c]===1)?1:0;if(v===0)z++;}fr.push(Math.round(z/n*100));}
+  const nAll=students.length,n=Math.max(1,activeCount()),k=crit.length,fr=[];
+  for(let c=0;c<k;c++){let z=0;for(let r=0;r<nAll;r++){if(isEx(r))continue;const v=(saved[r]&&saved[r][c]===1)?1:0;if(v===0)z++;}fr.push(Math.round(z/n*100));}
   let m=0,med=0,no=0;
-  for(let r=0;r<n;r++){let sum=0;for(let c=0;c<k;c++){if(saved[r]&&saved[r][c]===1)sum++;}const ratio=sum/k;if(ratio>=0.6)m++;else if(ratio>=0.4)med++;else no++;}
+  for(let r=0;r<nAll;r++){if(isEx(r))continue;let sum=0;for(let c=0;c<k;c++){if(saved[r]&&saved[r][c]===1)sum++;}const ratio=sum/k;if(ratio>=0.6)m++;else if(ratio>=0.4)med++;else no++;}
   const lvl=document.getElementById('mLevel').value;
   const def=crit.map((label,c)=>({label,fail:fr[c],goal:goalFor(sportObj,c)})).filter(d=>d.fail>50).sort((a,b)=>b.fail-a.fail);
   return {sportObj,crit,fr,def,m,med,no,n,hasMarks:!!diagMarks[key]};
@@ -2407,7 +2421,7 @@ let _cmId=null,_cmRows=[];   // كل صف: {o: الترتيب الأصلي (-1 �
 function openClassMgr(id){
   const c=classes.find(x=>x.id===id); if(!c)return;
   _cmId=id;
-  _cmRows=(c.names||[]).map(function(n,i){return {o:i,n:n};});
+  _cmRows=(c.names||[]).map(function(n,i){return {o:i,n:n,x:!!((c.ex||[])[i])};});
   document.getElementById('cmTtl').textContent='إدارة الفوج: '+c.name;
   document.getElementById('cmGrade').value=c.grade;
   document.getElementById('cmName').value=c.name;
@@ -2418,15 +2432,17 @@ function openClassMgr(id){
 function closeClassMgr(){document.getElementById('clsOv').classList.remove('show');_cmId=null;_cmRows=[];}
 function renderCmList(){
   const box=document.getElementById('cmList'),cnt=document.getElementById('cmCnt');
-  cnt.textContent='عدد التلاميذ: '+_cmRows.length;
+  const _nx=_cmRows.filter(function(r){return r.x;}).length;cnt.textContent='عدد التلاميذ: '+_cmRows.length+(_nx?' · معفى: '+_nx+' · محتسب: '+(_cmRows.length-_nx):'');
   if(!_cmRows.length){box.innerHTML='<div class="cls-empty">لا يوجد تلاميذ — أضفهم من الخانة أعلاه.</div>';return;}
   box.innerHTML=_cmRows.map(function(r,i){
     return '<div class="cm-row"><span class="cm-num">'+(i+1)+'</span>'+
-      '<input value="'+String(r.n).replace(/"/g,'&quot;')+'" oninput="cmEdit('+i+',this.value)">'+
+      '<input value="'+String(r.n).replace(/"/g,'&quot;')+'" oninput="cmEdit('+i+',this.value)"'+(r.x?' style="opacity:.55;text-decoration:line-through"':'')+'>'+
+      '<button class="cm-ex'+(r.x?' on':'')+'" onclick="cmEx('+i+')" title="معفى من التربية البدنية">'+(r.x?'معفى':'إعفاء')+'</button>'+
       '<button class="cm-del" onclick="cmDel('+i+')" title="حذف">×</button></div>';
   }).join('');
 }
 function cmEdit(i,v){ if(_cmRows[i])_cmRows[i].n=v; }
+function cmEx(i){ if(_cmRows[i]){_cmRows[i].x=!_cmRows[i].x; renderCmList();} }
 function cmDel(i){
   const r=_cmRows[i]; if(!r)return;
   if(!confirm('حذف التلميذ «'+r.n+'» من القائمة؟'))return;
@@ -2438,7 +2454,7 @@ function addStudent(){
   if(!raw){toast('⚠️ اكتب اسم التلميذ أولاً');return;}
   // يقبل عدّة أسماء دفعة واحدة (سطر لكل اسم)
   const adds=raw.split('\n').map(function(s){return s.trim();}).filter(Boolean);
-  adds.forEach(function(n){_cmRows.push({o:-1,n:n});});
+  adds.forEach(function(n){_cmRows.push({o:-1,n:n,x:false});});
   el.value=''; renderCmList();
   toast('✓ أُضيف '+adds.length+(adds.length>1?' تلاميذ':' تلميذ'));
 }
@@ -2446,7 +2462,7 @@ function saveClassMgr(){
   const c=classes.find(x=>x.id===_cmId); if(!c){closeClassMgr();return;}
   const nm=document.getElementById('cmName').value.trim();
   if(!nm){toast('⚠️ أدخل اسم القسم');return;}
-  const rows=_cmRows.map(function(r){return {o:r.o,n:String(r.n).trim()};}).filter(function(r){return r.n;});
+  const rows=_cmRows.map(function(r){return {o:r.o,n:String(r.n).trim(),x:!!r.x};}).filter(function(r){return r.n;});
   if(!rows.length){toast('⚠️ يجب أن يبقى تلميذ واحد على الأقل');return;}
   // أعد ترتيب نقاط التقويم لتبقى مرتبطة بصاحبها بعد الحذف أو الإضافة
   Object.keys(diagMarks).forEach(function(k){
@@ -2457,6 +2473,7 @@ function saveClassMgr(){
   c.grade=document.getElementById('cmGrade').value;
   c.name=nm;
   c.names=rows.map(function(r){return r.n;});
+  c.ex=rows.map(function(r){return r.x?1:0;});
   persistMarks();persistClasses();renderClassList();fillClassSelector();
   if(document.getElementById('tab1').classList.contains('on'))render();
   closeClassMgr();
@@ -2465,7 +2482,7 @@ function saveClassMgr(){
 function renderClassList(){
   const box=document.getElementById('classList');if(!box)return;
   if(!classes.length){box.innerHTML='<div class="cls-empty">لا توجد أقسام محفوظة بعد.</div>';return;}
-  box.innerHTML=classes.map(c=>`<div class="cls-item"><div class="ci-ic">${c.names.length}</div><div class="ci-t"><b>${c.name}</b><span>${c.grade} · ${c.names.length} تلميذاً</span></div><button class="ci-edit" onclick="openClassMgr('${c.id}')" title="تعديل وإضافة تلاميذ">✎</button><button class="ci-del" onclick="delClass('${c.id}')" title="حذف الفوج">×</button></div>`).join('');
+  box.innerHTML=classes.map(c=>`<div class="cls-item"><div class="ci-ic">${c.names.length}</div><div class="ci-t"><b>${c.name}</b><span>${c.grade} · ${c.names.length} تلميذاً${(c.ex||[]).some(Boolean)?' · '+c.ex.filter(Boolean).length+' معفى':''}</span></div><button class="ci-edit" onclick="openClassMgr('${c.id}')" title="تعديل وإضافة تلاميذ">✎</button><button class="ci-del" onclick="delClass('${c.id}')" title="حذف الفوج">×</button></div>`).join('');
 }
 function fillClassSelector(){
   const lvl=document.getElementById('mLevel').value;
@@ -2481,8 +2498,8 @@ function loadRoster(){
   const id=document.getElementById('mClass').value;
   const cls=classes.find(c=>c.id===id);
   const info=document.getElementById('rosterInfo');
-  if(cls){students=cls.names.slice();info.style.display='block';info.textContent='القسم: '+cls.name+' — '+students.length+' تلميذاً (قائمة محمّلة من الإعدادات).';}
-  else{students=["أحمد","عمر","سارة","فاطمة","يوسف","ليلى","كريم","نور","رضا","وليد"];info.style.display='block';info.textContent='لا يوجد قسم محفوظ لهذا المستوى — تُعرض قائمة نموذجية. أنشئ الأقسام من تبويب الإعدادات.';}
+  if(cls){students=cls.names.slice();studentEx=(cls.ex||[]).slice();const _ne=studentEx.filter(Boolean).length;info.style.display='block';info.textContent='القسم: '+cls.name+' — '+students.length+' تلميذاً'+(_ne?' (منهم '+_ne+' معفى، لا يُحتسب)':'')+' (قائمة محمّلة من الإعدادات).';}
+  else{studentEx=[];students=["أحمد","عمر","سارة","فاطمة","يوسف","ليلى","كريم","نور","رضا","وليد"];info.style.display='block';info.textContent='لا يوجد قسم محفوظ لهذا المستوى — تُعرض قائمة نموذجية. أنشئ الأقسام من تبويب الإعدادات.';}
   hideReport();render();
 }
 
@@ -3060,6 +3077,7 @@ function exportPdfDiag(){
     let hrows='<tr><th class="sn2">الرقم</th><th class="nm2">الاسم واللقب</th>'+crit.map((c,i)=>`<th>${i+1}. ${esc(c)}</th>`).join('')+'<th class="r2">النتيجة /5</th><th class="r2">المستوى</th></tr>';
     let body='';
     students.forEach((s,i)=>{
+      if(isEx(i)){body+=`<tr><td class="sn2">${i+1}</td><td class="nm2">${esc(s)}</td><td colspan="${crit.length+2}" style="text-align:center;color:#777;font-style:italic">معفى من التربية البدنية</td></tr>`;return;}
       let cells='',sum=0;
       crit.forEach((_,c)=>{const v=(saved[i]&&saved[i][c]===1)?1:0;sum+=v;cells+=`<td class="mk ${v?'one':'zero'}">${v}</td>`;});
       const ratio=sum/crit.length, lv=ratio>=0.6?'متحكم':ratio>=0.4?'متوسط':'غير متحكم', lc=ratio>=0.6?'one':ratio>=0.4?'mid':'zero';
@@ -3449,7 +3467,8 @@ function runStudentSearch(){
       acts+='<div class="st-act"><div class="st-act-t">'+esc2(sp.name)+'</div>'+items+
             '<div class="st-sum">المتحكَّم فيها: '+ok+' من '+labels.length+'</div></div>';
     });
-    if(!acts) acts='<div class="st-empty">لا توجد نتائج تقييم مسجّلة لهذا التلميذ بعد.</div>';
+    if(((m.cls.ex||[])[m.idx])) acts='<div class="st-empty">هذا التلميذ معفى من التربية البدنية.</div>';
+    else if(!acts) acts='<div class="st-empty">لا توجد نتائج تقييم مسجّلة لهذا التلميذ بعد.</div>';
     const initial=(m.name.trim()[0]||'؟');
     return '<div class="st-card"><div class="st-head"><div class="st-av">'+initial+'</div>'+
       '<div><div class="st-nm">'+esc2(m.name)+'</div><div class="st-cl">'+esc2(m.cls.name)+' · '+esc2(m.cls.grade)+'</div></div></div>'+
