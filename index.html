@@ -1009,8 +1009,12 @@ const isEx=function(i){return !!studentEx[i];};
 const activeCount=function(){let n=0;for(let i=0;i<students.length;i++)if(!studentEx[i])n++;return n;};
 let students=["أحمد","عمر","سارة","فاطمة","يوسف","ليلى","كريم","نور","رضا","وليد"]; // active roster (default sample)
 // ===== إصدار التطبيق وسجل التحديثات =====
-const APP_VERSION='3.5.1';
+const APP_VERSION='3.5.2';
 const CHANGELOG=[
+  {v:'الإصدار 3.5.2', items:[
+    'السنة الثانية والسنة الثالثة ثانوي: الكفاءة الختامية والكفاءة القاعدية لكل فصل والهدف التعلمي (جماعي/فردي) بنصوص المنهاج الرسمي، وتختلف بين المستويين وبين الفصول.',
+    'تظهر في التقويم التشخيصي وفي الوحدة التعلمية وفي المذكرة. المذكرات المحفوظة سابقاً: اضغط «استرجاع النموذج» لتحديثها.'
+  ]},
   {v:'الإصدار 3.5.1', items:[
     'حماية العمل من الضياع: نسخ تلقائية على الجهاز (يومياً، وقبل كل تحديث، وقبل أي مزامنة أو استيراد) مع استرجاع بضغطة من الإعدادات.',
     'المزامنة السحابية لم تعد تستبدل عملاً محلياً أحدث بنسخة أقدم؛ وفي حال التعارض تُحفظ نسخة الطرفين.',
@@ -1605,12 +1609,47 @@ const SPORTS={
      goals:['الإمساك الصحيح بالجلة وتثبيتها على الرقبة في وضعية استعداد متوازنة.','أداء حركة الزحف داخل الدائرة بتوافق لاكتساب سرعة أولية للدفع.','نقل ثقل الجسم من الرجل الخلفية ودوران الجذع لزيادة قوة الدفع.','مد الذراع بقوة وبزاوية مثالية لإطلاق الجلة لأبعد مسافة.','التحكم في التوازن بعد الدفع وعدم تجاوز حدود الدائرة.']}
   ]
 };
-// terminal competencies per grade — VERIFY against ministerial guide
+// الكفاءات الختامية لكل سنة: نص مصفوفة كفاءات التعليم الثانوي (منهاج السنة الثانية 2005 · السنة الثالثة 2006)
 const FINAL_COMP={
-  'سنة أولى ثانوي':'في نهاية الوحدة، يكون المتعلم قادراً على تبني وتيرات قاعدية وتكييف مجهوداته حسب الوضعيات والحالات التي يفرضها الموقف، فردياً وجماعياً، مع احترام القواعد والمبادئ المتفق عليها.',
-  'سنة ثانية ثانوي':'في نهاية الوحدة، يكون المتعلم قادراً على إدارة وتنظيم مجهوداته وتكييف ردود أفعاله الحركية بفعالية ضمن وضعيات متغيرة، مبدياً روح المبادرة والمسؤولية الفردية والجماعية.',
-  'سنة ثالثة ثانوي':'في نهاية الوحدة، يكون المتعلم قادراً على بناء وتنفيذ مشروع حركي/تكتيكي فعّال وتحمّل مسؤولية اختياراته، مع تثمين القدرات البدنية والقيم الرياضية في وضعيات منافسة مركّبة.'
+  'سنة أولى ثانوي':'أن يتمكن المتعلم من تنسيق وتكييف مختلف العمليات الفردية والجماعية حسب إيقاع معين، مسافة معينة، شدة معينة.',
+  'سنة ثانية ثانوي':'أن يتمكن المتعلم من تكييف وترشيد الاستجابات الحركية حسب صيغة وشكل الواجهة في وضعيات متعلقة بالمسافة، بالشدة، بالمدة، بالفضاء.',
+  'سنة ثالثة ثانوي':'أن يتمكن المتعلم من ضبط الاستجابات السلوكية مع تنويع أشكال وشدة الحركة قصد تحسين نتيجة أو منتوج رياضي ذو صبغة جمالية.'
 };
+// الكفاءة القاعدية (واحدة لكل فصل) والهدف التعلمي (جماعي/فردي) لكل فصل — نصوص المنهاج الرسمي.
+// (الجمباز مُستبعد.) السنة الأولى: تبقى على نصوص الأنشطة الحالية.
+const CURR={
+  'سنة ثانية ثانوي':[
+    {comp:'تقبل المواجهة فرديا وجماعيا والمشاركة الفعالة لتحقيق الفوز أو تحسين نتيجة رياضية.',
+     team:'المشاركة في منافسة باعتماد مبادئ المحاصرة والمضايقة وبعث الخلل لتسجيل أهداف أو نقاط تضمن التفوق.',
+     indiv:'التنافس من أجل الفوز أو مساعدة الزميل للفوز باحترام قواعد المواجهة النبيلة.'},
+    {comp:'الاندماج في الفوج والقيام بالدور المنوط به والمساهمة البناءة في المردود الفردي والجماعي.',
+     team:'ربط وتسلسل عمليات لبلوغ منطقة الخصم أو للدفاع عن المنطقة.',
+     indiv:'الجري حسب الفرق (تتابع، مداومة)، الرمي والوثب حسب الفرق والعمل على تطوير النتائج.'},
+    {comp:'اختيار وتطبيق خطة جماعية أو فردية للمحافظة على نتيجة رياضية أو تحسينها.',
+     team:'استثمار فضاءات معينة خلال التنقل بالكرة أو بدونها وإنهاء الهجوم بالتصويب.',
+     indiv:'اختيار المعالم الضرورية لتحقيق رمية أو وثبة أو قطع مسافة في أحسن الظروف.'}],
+  'سنة ثالثة ثانوي':[
+    {comp:'أن يتمكن المتعلم من الاستجابة المناسبة فرديا وجماعيا لمواجهة المؤثرات أو المواقف التي يفرضها الوضع.',
+     team:'محاصرة الخصم أو التخلص من المحاصرة والتحول المناسب من الدفاع إلى الهجوم والعكس.',
+     indiv:'تحقيق قطع مسافة، وثبة، رمية بطريقة قانونية.'},
+    {comp:'أن يتمكن المتعلم من تنويع التدخلات بمجهودات مناسبة لضمان أفضل نتيجة.',
+     team:'المشاركة في منافسة والقيام بأدوار دفاعية وهجومية.',
+     indiv:'أداء منافسة فردية قصد تحسين نتائجه الرياضية في حدود القانون.'},
+    {comp:'أن يتمكن المتعلم من تجنيد وتسيير طاقاته لتحقيق أفضل نتيجة.',
+     team:'القيام بالسند والتغطية في الدفاع والهجوم بما يناسب مواقع اللعب.',
+     indiv:'تحقيق نتيجة رياضية بتجنيد مختلف منابع الطاقة وبما يتماشى ومقياس التنقيط.'}]
+};
+function termIdx(t){return {'الفصل الأول':0,'الفصل الثاني':1,'الفصل الثالث':2}[t]||0;}
+// الكفاءة القاعدية للفصل: رسمية للثانية والثالثة، وللأولى النص المعتمد سابقاً
+function baseCompFor(lvl,term){
+  const c=CURR[lvl]; if(c)return c[termIdx(term)].comp;
+  return SPORTS.team[0].comp||'';
+}
+// الهدف التعلمي للفصل حسب نوع النشاط (team|indiv)
+function learnObjFor(lvl,term,kind,sp){
+  const c=CURR[lvl]; if(c)return c[termIdx(term)][kind];
+  return (sp&&sp.obj)||'';
+}
 
 // ===== قاعدة البيانات البيداغوجية الجزائرية (أهداف إجرائية لكل معيار) =====
 // المفتاح: المستوى -> النشاط -> رقم المعيار (1..5). أكمل بقية الأنشطة/المستويات بنفس النمط.
@@ -1777,7 +1816,9 @@ function hideReport(){document.getElementById('report').style.display='none';}
 
 function render(){
   const crit=getCrit(cur);
-  document.getElementById('curric').innerHTML=`<div class="row"><span class="tag">الكفاءة القاعدية</span><span class="txt">${cur.comp}</span></div><div class="row"><span class="tag">الهدف التعلمي</span><span class="txt">${cur.obj}</span></div>`;
+  const _lv=document.getElementById('mLevel').value,_tm=curTerm(),_kd=(SPORTS.team.indexOf(cur)>=0)?'team':'indiv';
+  const _bc=CURR[_lv]?baseCompFor(_lv,_tm):cur.comp, _lo=CURR[_lv]?learnObjFor(_lv,_tm,_kd,cur):cur.obj;
+  document.getElementById('curric').innerHTML=`<div class="row"><span class="tag">الكفاءة الختامية</span><span class="txt">${FINAL_COMP[_lv]||''}</span></div><div class="row"><span class="tag">الكفاءة القاعدية</span><span class="txt">${_bc}</span></div><div class="row"><span class="tag">الهدف التعلمي</span><span class="txt">${_lo}</span></div>`;
   document.getElementById('gHead').innerHTML='<tr><th class="name">التلميذ</th>'+
     crit.map((c,i)=>`<th><span class="num">المعيار ${i+1}</span><span class="editc" contenteditable="true" data-c="${i}" oninput="editCrit(this)">${c}</span></th>`).join('')+
     '<th class="res">النتيجة /5</th><th class="res">المستوى</th></tr>';
@@ -1988,7 +2029,7 @@ function syncUnitFromDiag(){
   if(diagStore.indiv)document.getElementById('uIndiv').value=diagStore.indiv.sportId;
   // keep final competency consistent with level unless teacher already edited it
   const f=document.getElementById('uFinal');
-  if(!f.value.trim()||f.dataset.auto==='1'){f.value=FINAL_COMP[lvl]||'';f.dataset.auto='1';}
+  if(!f.value.trim()||f.dataset.auto==='1'){f.value=baseCompFor(lvl,curTerm());f.dataset.auto='1';}
 }
 
 // ===== TAB 2 LOGIC =====
@@ -1999,7 +2040,7 @@ function initTab2(){
   document.getElementById('uIndiv').onchange=refreshInject;
   setFinalComp();
 }
-function setFinalComp(){const f=document.getElementById('uFinal');f.value=FINAL_COMP[document.getElementById('uLevel').value]||'';f.dataset.auto='1';}
+function setFinalComp(){const f=document.getElementById('uFinal');f.value=baseCompFor(document.getElementById('uLevel').value,curTerm());f.dataset.auto='1';}
 
 function goalsFor(catKey){
   const sel=document.getElementById(catKey==='team'?'uTeam':'uIndiv').value;
@@ -2048,7 +2089,7 @@ function generateUnit(){
       <td><textarea>${r.i}</textarea></td>
       <td><textarea>${r.c}</textarea></td></tr>`).join('');
   // store globally for journal + lesson plan
-  unitPlan={teamSport:teamD.sport.name,indivSport:indivD.sport.name,rows:rows.map(r=>({n:r.n,type:r.type,cls:r.cls,t:r.t,i:r.i,c:r.c,tc:r.tc,ic:r.ic,ts:r.ts,is:r.is}))};
+  unitPlan={level:document.getElementById('uLevel').value,term:curTerm(),teamSport:teamD.sport.name,indivSport:indivD.sport.name,rows:rows.map(r=>({n:r.n,type:r.type,cls:r.cls,t:r.t,i:r.i,c:r.c,tc:r.tc,ic:r.ic,ts:r.ts,is:r.is}))};
   try{localStorage.setItem('delbaz_eps_unit',JSON.stringify(unitPlan));}catch(e){}
   document.getElementById('unitPlaceholder').style.display='none';
   document.getElementById('unitOut').style.display='block';
@@ -2892,9 +2933,10 @@ function renderLesson(forceFresh){
   const lLvl=document.getElementById('lLevel').value;
   const _rw=unitPlan?unitPlan.rows[k]:null;
   const indivMain=rowDrills(indivSport,_rw,'i',lLvl), teamMain=rowDrills(teamSport,_rw,'t',lLvl);
-  const baseComp=FINAL_COMP[document.getElementById('lLevel').value]||'';
-  const indivLearn=(SPORTS.indiv.find(s=>s.name===indivSport)||{}).obj||'';
-  const teamLearn=(SPORTS.team.find(s=>s.name===teamSport)||{}).obj||'';
+  const _trm=(unitPlan&&unitPlan.term)||curTerm();
+  const baseComp=baseCompFor(lLvl,_trm);
+  const indivLearn=learnObjFor(lLvl,_trm,'indiv',SPORTS.indiv.find(s=>s.name===indivSport));
+  const teamLearn=learnObjFor(lLvl,_trm,'team',SPORTS.team.find(s=>s.name===teamSport));
   const today=new Date().toLocaleDateString('fr-FR');
   const E='contenteditable="true" class="editor-cell"';
   document.getElementById('lessonBody').innerHTML=`
