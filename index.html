@@ -1020,7 +1020,7 @@ const isEx=function(i){return !!studentEx[i];};
 const activeCount=function(){let n=0;for(let i=0;i<students.length;i++)if(!studentEx[i])n++;return n;};
 let students=["أحمد","عمر","سارة","فاطمة","يوسف","ليلى","كريم","نور","رضا","وليد"]; // active roster (default sample)
 // ===== إصدار التطبيق وسجل التحديثات =====
-const APP_VERSION='3.6.0';
+const APP_VERSION='3.6.1';
 const CHANGELOG=[
   {v:'الإصدار 3.6.0', items:[
     'مساحة عمل مستقلة لكل قسم ولكل فصل: التقويم التشخيصي، بناء الوحدة، المذكرات والدفتر اليومي. تبدّل القسم وتعود فتجد كل شيء كما تركته.',
@@ -1923,7 +1923,8 @@ function goalFor(sportObj,c){
   }
   return getTargetObjective(lvl,sportObj.name,c+1)||sportObj.goals[c]||('أن يكون التلميذ قادراً على '+(dbCrit||''));
 }
-function markKey(){return (document.getElementById('mClass').value||'sample')+'|'+cur.id;}
+function mkKey(cid,sid,term){term=term||curTerm();const k=cid+'|'+sid+'|'+term,lg=cid+'|'+sid;if(diagMarks[k]===undefined&&diagMarks[lg]!==undefined){diagMarks[k]=diagMarks[lg];delete diagMarks[lg];persistMarks();}return k;}
+function markKey(){return mkKey(document.getElementById('mClass').value||'sample',cur.id);}
 function persistMarks(){try{localStorage.setItem('delbaz_eps_marks',JSON.stringify(diagMarks));}catch(e){}}
 function persistCustomCrit(){try{localStorage.setItem('delbaz_eps_crit',JSON.stringify(customCrit));}catch(e){}}
 
@@ -2039,7 +2040,7 @@ function recalc(){
 // حساب نقائص نشاط من نتائجه المحفوظة
 function extractFor(sportObj){
   const crit=getCrit(sportObj);
-  const key=(document.getElementById('mClass').value||'sample')+'|'+sportObj.id;
+  const key=mkKey(document.getElementById('mClass').value||'sample',sportObj.id);
   const saved=diagMarks[key]||[];
   const nAll=students.length,n=Math.max(1,activeCount()),k=crit.length,fr=[];
   for(let c=0;c<k;c++){let z=0;for(let r=0;r<nAll;r++){if(isEx(r))continue;const v=(saved[r]&&saved[r][c]===1)?1:0;if(v===0)z++;}fr.push(Math.round(z/n*100));}
@@ -3251,7 +3252,7 @@ function exportPdfDiag(){
   function sportPage(sportObj,isLast){
     const e=extractFor(sportObj);
     const crit=e.crit;
-    const key=(document.getElementById('mClass').value||'sample')+'|'+sportObj.id;
+    const key=mkKey(document.getElementById('mClass').value||'sample',sportObj.id);
     const saved=diagMarks[key]||[];
     let hrows='<tr><th class="sn2">الرقم</th><th class="nm2">الاسم واللقب</th>'+crit.map((c,i)=>`<th>${i+1}. ${esc(c)}</th>`).join('')+'<th class="r2">النتيجة /5</th><th class="r2">المستوى</th></tr>';
     let body='';
@@ -3632,7 +3633,7 @@ function runStudentSearch(){
     // اجمع نتائج كل الأنشطة المسجّلة لهذا القسم
     let acts='';
     _allSports().forEach(function(sp){
-      const key=m.cls.id+'|'+sp.id;
+      const key=mkKey(m.cls.id,sp.id);
       const rows=diagMarks[key];
       if(!rows||!rows[m.idx])return;
       const row=rows[m.idx];
@@ -3939,7 +3940,7 @@ function cloudPull(){
 try{safetyStartup();}catch(e){}
 try{cloudInit();}catch(e){}
 
-loadWorkspaces();loadSettings();loadClasses();loadSchedule();try{const mk=localStorage.getItem('delbaz_eps_marks');if(mk)diagMarks=JSON.parse(mk);}catch(e){}try{const cc=localStorage.getItem('delbaz_eps_crit');if(cc)customCrit=JSON.parse(cc);}catch(e){}try{const ls=localStorage.getItem('delbaz_eps_lessons');if(ls)lessonsSaved=JSON.parse(ls);}catch(e){}try{const li=localStorage.getItem('delbaz_eps_lessoninfo');if(li)lessonInfo=JSON.parse(li);}catch(e){}try{const ts=localStorage.getItem('delbaz_eps_terms');if(ts)termSports=JSON.parse(ts);}catch(e){}try{const dr=localStorage.getItem('delbaz_eps_drills');if(dr)drillEdits=JSON.parse(dr);}catch(e){}try{const jn=localStorage.getItem('delbaz_eps_dailylogs');if(jn)dailyLogs=JSON.parse(jn);}catch(e){}migrateV36();restoreLastCtx();cur=SPORTS.team.find(s=>s.id===termRec().team)||SPORTS.team[0];renderSubs();renderTermPick();render();initTab2();
+loadWorkspaces();try{const mk=localStorage.getItem('delbaz_eps_marks');if(mk)diagMarks=JSON.parse(mk);}catch(e){}try{const cc=localStorage.getItem('delbaz_eps_crit');if(cc)customCrit=JSON.parse(cc);}catch(e){}try{const ls=localStorage.getItem('delbaz_eps_lessons');if(ls)lessonsSaved=JSON.parse(ls);}catch(e){}try{const li=localStorage.getItem('delbaz_eps_lessoninfo');if(li)lessonInfo=JSON.parse(li);}catch(e){}try{const ts=localStorage.getItem('delbaz_eps_terms');if(ts)termSports=JSON.parse(ts);}catch(e){}try{const dr=localStorage.getItem('delbaz_eps_drills');if(dr)drillEdits=JSON.parse(dr);}catch(e){}try{const jn=localStorage.getItem('delbaz_eps_dailylogs');if(jn)dailyLogs=JSON.parse(jn);}catch(e){}loadSettings();loadClasses();loadSchedule();migrateV36();restoreLastCtx();cur=SPORTS.team.find(s=>s.id===termRec().team)||SPORTS.team[0];renderSubs();renderTermPick();render();initTab2();
 setTimeout(showUpdate,800);
 window.addEventListener('load',function(){setTimeout(showUpdate,1400);});
 // تذكير لطيف بالنسخة الاحتياطية (إن مضى أكثر من 14 يوماً وهناك بيانات فعلية)
