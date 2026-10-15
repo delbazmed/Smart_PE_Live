@@ -1020,7 +1020,7 @@ const isEx=function(i){return !!studentEx[i];};
 const activeCount=function(){let n=0;for(let i=0;i<students.length;i++)if(!studentEx[i])n++;return n;};
 let students=["أحمد","عمر","سارة","فاطمة","يوسف","ليلى","كريم","نور","رضا","وليد"]; // active roster (default sample)
 // ===== إصدار التطبيق وسجل التحديثات =====
-const APP_VERSION='3.6.1';
+const APP_VERSION='3.6.2';
 const CHANGELOG=[
   {v:'الإصدار 3.6.0', items:[
     'مساحة عمل مستقلة لكل قسم ولكل فصل: التقويم التشخيصي، بناء الوحدة، المذكرات والدفتر اليومي. تبدّل القسم وتعود فتجد كل شيء كما تركته.',
@@ -3809,9 +3809,13 @@ function snapPut(label,dataObj){
     return new Promise(function(res,rej){
       const tx=db.transaction('snaps','readwrite'),st=tx.objectStore('snaps');
       st.add({t:Date.now(),label:label,ver:APP_VERSION,sig:sig,nc:nc,size:raw.length,data:data});
-      // احتفظ بآخر 25 نسخة فقط
-      const extra=all.length+1-25;
-      for(let i=0;i<extra;i++)st.delete(all[i].id);
+      // احتفاظ مُقلَّص: آخر 4 نسخ «مهمة» (قبل تحديث/استرجاع/استيراد) + آخر 6 نسخ عادية
+      const _imp=function(l){return /قبل التحديث|قبل الاستعادة|قبل استيراد|أول تشغيل/.test(l||'');};
+      const keepImp=4,keepNorm=6;let ci=_imp(label)?1:0,cn=_imp(label)?0:1;
+      for(let i=all.length-1;i>=0;i--){
+        if(_imp(all[i].label)){if(ci<keepImp)ci++;else st.delete(all[i].id);}
+        else{if(cn<keepNorm)cn++;else st.delete(all[i].id);}
+      }
       tx.oncomplete=function(){try{_rawSet('delbaz_eps_lastsnap',String(Date.now()));_rawSet('delbaz_eps_lastsnapsig',sig);}catch(e){}res(true);};
       tx.onerror=function(){rej(tx.error);};
     });});}).catch(function(){return false;});
@@ -3842,12 +3846,19 @@ function renderSnaps(){
   const box=document.getElementById('snapBox');if(!box)return;
   _idbAll().then(function(all){
     if(!all.length){box.innerHTML='<div class="settings-note">لا توجد نسخ تلقائية بعد؛ ستُنشأ تلقائياً (يومياً وقبل كل تحديث ومزامنة).</div>';return;}
-    box.innerHTML=all.slice().reverse().map(function(x){
-      return '<div class="cm-row" style="gap:6px"><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:800;color:var(--navy)">'+esc2(x.label)+'</div>'+
+    const rows=all.slice().reverse().map(function(x,i){
+      return '<div class="cm-row snap-r" style="gap:6px;'+(i>=3?'display:none':'')+'" data-i="'+i+'"><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:800;color:var(--navy)">'+esc2(x.label)+'</div>'+
         '<div style="font-size:10.5px;color:var(--muted)">'+_fmtSnap(x.t)+' · '+x.nc+' قسم · '+Math.round(x.size/1024)+' ك.ب</div></div>'+
         '<button class="cm-ex on" onclick="restoreSnap('+x.id+')">استرجاع</button></div>';
     }).join('');
+    box.innerHTML=rows+(all.length>3?'<button class="cm-ex" id="snapMore" style="width:100%;margin-top:8px" onclick="toggleSnaps()">عرض كل النسخ ('+all.length+')</button>':'');
   }).catch(function(){box.innerHTML='<div class="settings-note">تعذّر فتح النسخ التلقائية على هذا المتصفح.</div>';});
+}
+function toggleSnaps(){
+  const rs=document.querySelectorAll('#snapBox .snap-r'),b=document.getElementById('snapMore');
+  const open=b&&b.dataset.open==='1';
+  rs.forEach(function(r,i){r.style.display=(open&&i>=3)?'none':'flex';});
+  if(b){b.dataset.open=open?'0':'1';b.textContent=open?'عرض كل النسخ ('+rs.length+')':'إخفاء القديمة';}
 }
 function restoreSnap(id){
   _idbGet(id).then(function(x){
