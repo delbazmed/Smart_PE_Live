@@ -566,7 +566,7 @@ body.dark .qr-link{background:#10202c}
     <div class="curric" id="curric"></div>
     <div class="block" style="padding:14px">
       <div class="block-h"><svg viewBox="0 0 24 24"><path d="M3 3h18v18H3zM3 9h18M3 15h18M9 3v18"/></svg>شبكة التقييم الرقمية</div>
-      <div class="hint-edit"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>المعايير قابلة للتعديل — انقر على أي عنوان معيار لتغيير نصّه، ويُحدَّث التقرير آلياً.</div>
+      <div class="hint-edit"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4z"/></svg><b>المعايير المعروضة افتراضية</b> (مقترحة حسب المنهاج) — يمكنك تعديلها: انقر على أي عنوان معيار لتغيير نصّه، فيُحفظ لقسمك ويُحدَّث التقرير والوحدة آلياً.</div>
       <div class="gwrap"><table id="grid"><thead id="gHead"></thead><tbody id="gBody"></tbody><tfoot id="gFoot"></tfoot></table></div>
       <div style="margin-top:9px;font-size:10.5px;color:var(--muted);display:flex;gap:14px;justify-content:center;font-family:var(--fh);font-weight:700">
         <span><b style="color:var(--mint-d)">1</b> = متحكم في المعيار</span>
@@ -866,6 +866,10 @@ body.dark .qr-link{background:#10202c}
     <div class="block">
       <div class="block-h"><svg viewBox="0 0 24 24"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>③ الجدول الأسبوعي الثابت</div>
       <div class="settings-note">جدول توقيت مصغّر: اختر القسم في كل خانة (يوم × فترة). يستعمله الدفتر اليومي آلياً.</div>
+      <div class="settings-note" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:8px;align-items:center">الفترة المسائية في مؤسستك: من
+        <select id="pEs" onchange="setEvening()" style="padding:5px 8px;border-radius:8px;border:1px solid var(--line)"></select> إلى
+        <select id="pEe" onchange="setEvening()" style="padding:5px 8px;border-radius:8px;border:1px solid var(--line)"></select>
+        <span style="font-size:10.5px">(حصص من ساعة؛ الفترة الصباحية 08-10 و10-12)</span></div>
       <div class="gwrap"><div id="schGrid"></div></div>
     </div>
 
@@ -1020,8 +1024,14 @@ const isEx=function(i){return !!studentEx[i];};
 const activeCount=function(){let n=0;for(let i=0;i<students.length;i++)if(!studentEx[i])n++;return n;};
 let students=["أحمد","عمر","سارة","فاطمة","يوسف","ليلى","كريم","نور","رضا","وليد"]; // active roster (default sample)
 // ===== إصدار التطبيق وسجل التحديثات =====
-const APP_VERSION='3.6.2';
+const APP_VERSION='3.6.3';
 const CHANGELOG=[
+  {v:'الإصدار 3.6.3', items:[
+    'الجدول الأسبوعي: اختر بداية ونهاية الفترة المسائية حسب مؤسستك (من 13:00 إلى 18:00)؛ الخانات المعبّأة لا تضيع.',
+    'التقويم التشخيصي: ملاحظة بأن المعايير افتراضية وقابلة للتعديل.',
+    'لائحة النسخ التلقائية مختصرة (3 ظاهرة + «عرض الكل»)، واحتفاظ أقل.',
+    'إصلاح: علامات التقويم التشخيصي كانت تُمسح عند إعادة فتح التطبيق؛ وصارت النتائج محفوظة لكل (قسم ← فصل).'
+  ]},
   {v:'الإصدار 3.6.0', items:[
     'مساحة عمل مستقلة لكل قسم ولكل فصل: التقويم التشخيصي، بناء الوحدة، المذكرات والدفتر اليومي. تبدّل القسم وتعود فتجد كل شيء كما تركته.',
     'شريط «مساحة العمل» (المستوى · القسم · الفصل) أعلى التطبيق، ويفتح التطبيق على آخر قسم عملت عليه.',
@@ -2679,19 +2689,47 @@ function loadRoster(){
 
 // ===== WEEKLY SCHEDULE (compact timetable grid) =====
 const SCH_DAYS=['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','السبت'];
-const SCH_PERIODS=['08:00 - 10:00','10:00 - 12:00','13:30 - 14:30','14:30 - 15:30','15:30 - 16:30'];
-const PERIOD_SHORT={'08:00 - 10:00':'08-10','10:00 - 12:00':'10-12','13:30 - 14:30':'13:30-14:30','14:30 - 15:30':'14:30-15:30','15:30 - 16:30':'15:30-16:30'};
+const SCH_MORNING=['08:00 - 10:00','10:00 - 12:00'];
+let SCH_PERIODS=SCH_MORNING.slice();
+let periodCfg={eS:'13:30',eE:'16:30'};
+function pShort(p){return String(p).replace(/ /g,'').replace(/:00/g,'');}
+function _mm(t){const m=/(\d+):(\d+)/.exec(t);return m?(+m[1]*60+ +m[2]):0;}
+function _hm(x){return String(Math.floor(x/60)).padStart(2,'0')+':'+String(x%60).padStart(2,'0');}
+// الفترات = صباحية ثابتة + حصص مسائية (ساعة) بين البداية والنهاية المختارتين + أي فترة قديمة فيها قسم مسجّل (لا يضيع شيء)
+function buildPeriods(){
+  const out=SCH_MORNING.slice();
+  for(let t=_mm(periodCfg.eS);t+60<=_mm(periodCfg.eE);t+=60)out.push(_hm(t)+' - '+_hm(t+60));
+  Object.keys(schedule).forEach(function(k){const p=k.split('|')[1];if(p&&out.indexOf(p)<0&&/^\d\d:\d\d - \d\d:\d\d$/.test(p))out.push(p);});
+  out.sort(function(x,y){return _periodStartMin(x)-_periodStartMin(y);});
+  SCH_PERIODS=out;
+}
+function setEvening(){
+  const s=document.getElementById('pEs').value,e=document.getElementById('pEe').value;
+  if(_mm(e)-_mm(s)<60){toast('⚠️ يجب أن تكون الفترة المسائية ساعة على الأقل');renderPeriodCfg();return;}
+  periodCfg={eS:s,eE:e};
+  try{localStorage.setItem('delbaz_eps_periods',JSON.stringify(periodCfg));}catch(x){}
+  buildPeriods();renderSchedule();try{renderWeekView();renderNextClass();}catch(x){}
+  toast('✓ تم تحديث الفترات');
+}
+function renderPeriodCfg(){
+  const a=document.getElementById('pEs'),b=document.getElementById('pEe');if(!a||!b)return;
+  const o=(arr,v)=>arr.map(t=>'<option value="'+t+'"'+(t===v?' selected':'')+'>'+t+'</option>').join('');
+  a.innerHTML=o(['13:00','13:30','14:00'],periodCfg.eS);
+  b.innerHTML=o(['16:00','16:30','17:00','17:30','18:00'],periodCfg.eE);
+}
 function loadSchedule(){
   try{const raw=localStorage.getItem('delbaz_eps_schedule');if(raw){const p=JSON.parse(raw);schedule=Array.isArray(p)?{}:p;}}catch(e){schedule={};}
+  try{const pc=JSON.parse(localStorage.getItem('delbaz_eps_periods')||'null');if(pc&&pc.eS&&pc.eE)periodCfg=pc;}catch(e){}
+  buildPeriods();renderPeriodCfg();
   renderSchedule();
 }
 function persistSchedule(){try{localStorage.setItem('delbaz_eps_schedule',JSON.stringify(schedule));}catch(e){}}
-function setSlot(day,period,classId){const k=day+'|'+period;if(classId)schedule[k]=classId;else delete schedule[k];persistSchedule();renderSchedule();}
+function setSlot(day,period,classId){const k=day+'|'+period;if(classId)schedule[k]=classId;else delete schedule[k];persistSchedule();buildPeriods();renderSchedule();}
 function renderSchedule(){
   const box=document.getElementById('schGrid');if(!box)return;
   if(!classes.length){box.innerHTML='<div class="cls-empty">أنشئ أقساماً أولاً لتتمكن من ملء الجدول.</div>';return;}
   const optsFor=sel=>'<option value="">—</option>'+classes.map(c=>`<option value="${c.id}" ${c.id===sel?'selected':''}>${c.name}</option>`).join('');
-  let html='<table class="schg"><thead><tr><th>اليوم \\ الفترة</th>'+SCH_PERIODS.map(p=>`<th>${PERIOD_SHORT[p]}</th>`).join('')+'</tr></thead><tbody>';
+  let html='<table class="schg"><thead><tr><th>اليوم \\ الفترة</th>'+SCH_PERIODS.map(p=>`<th>${pShort(p)}</th>`).join('')+'</tr></thead><tbody>';
   SCH_DAYS.forEach(day=>{
     html+='<tr><td class="day">'+day+'</td>';
     SCH_PERIODS.forEach(p=>{const cur=schedule[day+'|'+p]||'';
@@ -2756,7 +2794,7 @@ function renderWeekView(){
   const now=new Date(); const todayName=DAY_AR[now.getDay()];
   const nowMin=now.getHours()*60+now.getMinutes();
   let html='<div class="wv-wrap"><table class="wv"><thead><tr><th>اليوم</th>'+
-    SCH_PERIODS.map(p=>'<th>'+PERIOD_SHORT[p]+'</th>').join('')+'</tr></thead><tbody>';
+    SCH_PERIODS.map(p=>'<th>'+pShort(p)+'</th>').join('')+'</tr></thead><tbody>';
   SCH_DAYS.forEach(function(day){
     const isToday=(day===todayName);
     html+='<tr'+(isToday?' class="today"':'')+'><td class="wv-day">'+day+'</td>';
@@ -3609,7 +3647,7 @@ const firebaseConfig={
   messagingSenderId:"999797512825",
   appId:"1:999797512825:web:33de4012e8b0e2952ed2a8"
 };
-const SYNC_KEYS=['delbaz_eps_settings','delbaz_eps_classes','delbaz_eps_schedule','delbaz_eps_marks','delbaz_eps_crit','delbaz_eps_unit','delbaz_eps_units','delbaz_eps_ws','delbaz_eps_lessons','delbaz_eps_terms','delbaz_eps_dailylogs','delbaz_eps_lessoninfo','delbaz_eps_drills'];
+const SYNC_KEYS=['delbaz_eps_settings','delbaz_eps_classes','delbaz_eps_schedule','delbaz_eps_marks','delbaz_eps_crit','delbaz_eps_unit','delbaz_eps_units','delbaz_eps_ws','delbaz_eps_lessons','delbaz_eps_terms','delbaz_eps_dailylogs','delbaz_eps_lessoninfo','delbaz_eps_drills','delbaz_eps_periods'];
 
 // ===================== بحث عن تلميذ (3ب) =====================
 function _allSports(){return SPORTS.team.concat(SPORTS.indiv);}
