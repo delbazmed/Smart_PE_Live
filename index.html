@@ -485,6 +485,12 @@ body.dark .qr-link{background:#10202c}
 .fab svg{width:19px;height:19px;stroke:#06231b;fill:none;stroke-width:2.5}
 .toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--navy);color:#fff;padding:11px 22px;border-radius:30px;font-size:13px;font-weight:700;opacity:0;transition:.3s;z-index:60;box-shadow:var(--shl);font-family:var(--fh)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.dsub{display:flex;gap:6px;margin-bottom:10px}.dsb{font-family:var(--fh);font-weight:800;font-size:12px;border:1px solid var(--line);background:var(--mint-soft);color:var(--mint-d);border-radius:20px;padding:6px 14px}
+.ypbox{background:#fbe9dc;border-radius:12px;padding:10px;color:#16263a}.ywrap{overflow-x:auto}.ywrap table{min-width:640px}
+.ybtn{font-family:var(--fh);font-weight:800;font-size:12px;border:1px solid var(--line);background:#fff;color:var(--navy);border-radius:10px;padding:8px 12px;cursor:pointer}.ybtn.pri{background:var(--mint);border-color:var(--mint);color:#06231b}
+.ytb{display:flex;flex-wrap:wrap;gap:3px;min-width:118px;justify-content:center}.ytb button{border:1px solid #888;background:#fff;border-radius:6px;font-size:11px;padding:2px 6px;min-width:24px;cursor:pointer}.ytb button.on{background:var(--mint);color:#06231b}.ytb select{font-size:10px;max-width:92px;padding:2px;border-radius:6px;border:1px solid #888}
+.ynote button{border:none;background:transparent;color:#a33;cursor:pointer;margin-inline-start:8px}.ypbox [contenteditable="true"]{outline:1px dashed rgba(12,33,56,.25);outline-offset:-2px;cursor:text}.ypbox [contenteditable="true"]:focus{outline:2px solid var(--mint-d);background:#fffbe6}.yalink{font-size:10px}
+@media print{#tab7 .ybtn,#tab7 #ypBar,.dsub{display:none!important}}
 @media print{
   body{background:#fff;padding:0}
   header,nav,.block,.curric,.defi,.fab,.toast,.print-btn,.btn-row,.hint-edit,.no-print,.rtbar{display:none!important}
@@ -524,6 +530,7 @@ body.dark .qr-link{background:#10202c}
     <button class="tab" data-i="1" onclick="switchTab(1,this)">بناء الوحدة التعلمية</button>
     <button class="tab" data-i="3" onclick="switchTab(3,this)">المذكرة التربوية</button>
     <button class="tab" data-i="2" onclick="switchTab(2,this)">الدفتر اليومي</button>
+    <button class="tab" data-i="6" onclick="switchTab(6,this)">التوزيعات</button>
     <button class="tab" data-i="4" onclick="switchTab(4,this)">النظري</button>
     <button class="tab" data-i="5" onclick="switchTab(5,this)">الإعدادات</button>
   </nav>
@@ -772,6 +779,20 @@ body.dark .qr-link{background:#10202c}
       <div id="thTeam" class="th-grid"></div>
       <div class="th-secttl">القانون الدولي الحديث (PDF)</div>
       <div id="thLaw" class="th-grid"></div>
+    </div>
+  </div>
+
+  <!-- ============ TAB 7 : التوزيعات ============ -->
+  <div class="sec pane" id="tab7">
+    <div class="block">
+      <div class="block-h"><svg viewBox="0 0 24 24"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>التوزيعات</div>
+      <div class="dsub"><button class="dsb on">التوزيع السنوي</button></div>
+      <div class="settings-note" style="margin-bottom:10px">لكل مستوى توزيعه الخاص، محفوظ تلقائياً. أنشطته مرتبطة بأنشطة الفصول المختارة في التطبيق.</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px">
+        <select id="ypLevel" onchange="ypSetLevel(this.value)" style="padding:8px 10px;border-radius:10px;border:1px solid var(--line);font-family:var(--fh);font-weight:700"><option>سنة أولى ثانوي</option><option>سنة ثانية ثانوي</option><option>سنة ثالثة ثانوي</option></select>
+        <div id="ypBar" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+      </div>
+      <div id="ypBox" class="ypbox"></div>
     </div>
   </div>
 
@@ -1024,8 +1045,13 @@ const isEx=function(i){return !!studentEx[i];};
 const activeCount=function(){let n=0;for(let i=0;i<students.length;i++)if(!studentEx[i])n++;return n;};
 let students=["أحمد","عمر","سارة","فاطمة","يوسف","ليلى","كريم","نور","رضا","وليد"]; // active roster (default sample)
 // ===== إصدار التطبيق وسجل التحديثات =====
-const APP_VERSION='3.6.3';
+const APP_VERSION='3.7.0';
 const CHANGELOG=[
+  {v:'الإصدار 3.7.0', items:[
+    'تبويب جديد «التوزيعات» وفيه «التوزيع السنوي للحصص والأنشطة» لكل مستوى، قابل للتعديل بالكامل (التواريخ، نوع الحصة، الألوان، الصفوف).',
+    'أنشطة التوزيع مرتبطة آلياً بأنشطة الفصول المختارة في التطبيق.',
+    'المؤسسة والأستاذ والسنة الدراسية والإمضاءات (الأستاذ، الناظر، المفتش) قابلة للتعديل، مع حفظ تلقائي وزر «حفظ التعديل والإغلاق» وطباعة A4.'
+  ]},
   {v:'الإصدار 3.6.3', items:[
     'الجدول الأسبوعي: اختر بداية ونهاية الفترة المسائية حسب مؤسستك (من 13:00 إلى 18:00)؛ الخانات المعبّأة لا تضيع.',
     'التقويم التشخيصي: ملاحظة بأن المعايير افتراضية وقابلة للتعديل.',
@@ -2102,6 +2128,7 @@ function switchTab(idx,btn){
   if(idx===2)initJournal();
   if(idx===3){loadCtx();renderLesson();}
   if(idx===4)renderTheory();
+  if(idx===6){ypEdit=false;renderDist();}
   if(idx===5){try{renderSnaps();}catch(e){}const av=document.getElementById('aboutVer');if(av)av.textContent='الإصدار '+APP_VERSION;}
   window.scrollTo({top:0});
 }
@@ -3647,7 +3674,7 @@ const firebaseConfig={
   messagingSenderId:"999797512825",
   appId:"1:999797512825:web:33de4012e8b0e2952ed2a8"
 };
-const SYNC_KEYS=['delbaz_eps_settings','delbaz_eps_classes','delbaz_eps_schedule','delbaz_eps_marks','delbaz_eps_crit','delbaz_eps_unit','delbaz_eps_units','delbaz_eps_ws','delbaz_eps_lessons','delbaz_eps_terms','delbaz_eps_dailylogs','delbaz_eps_lessoninfo','delbaz_eps_drills','delbaz_eps_periods'];
+const SYNC_KEYS=['delbaz_eps_settings','delbaz_eps_classes','delbaz_eps_schedule','delbaz_eps_marks','delbaz_eps_crit','delbaz_eps_unit','delbaz_eps_units','delbaz_eps_ws','delbaz_eps_lessons','delbaz_eps_terms','delbaz_eps_dailylogs','delbaz_eps_lessoninfo','delbaz_eps_drills','delbaz_eps_periods','delbaz_eps_yearplan'];
 
 // ===================== بحث عن تلميذ (3ب) =====================
 function _allSports(){return SPORTS.team.concat(SPORTS.indiv);}
@@ -3989,7 +4016,199 @@ function cloudPull(){
 try{safetyStartup();}catch(e){}
 try{cloudInit();}catch(e){}
 
-loadWorkspaces();try{const mk=localStorage.getItem('delbaz_eps_marks');if(mk)diagMarks=JSON.parse(mk);}catch(e){}try{const cc=localStorage.getItem('delbaz_eps_crit');if(cc)customCrit=JSON.parse(cc);}catch(e){}try{const ls=localStorage.getItem('delbaz_eps_lessons');if(ls)lessonsSaved=JSON.parse(ls);}catch(e){}try{const li=localStorage.getItem('delbaz_eps_lessoninfo');if(li)lessonInfo=JSON.parse(li);}catch(e){}try{const ts=localStorage.getItem('delbaz_eps_terms');if(ts)termSports=JSON.parse(ts);}catch(e){}try{const dr=localStorage.getItem('delbaz_eps_drills');if(dr)drillEdits=JSON.parse(dr);}catch(e){}try{const jn=localStorage.getItem('delbaz_eps_dailylogs');if(jn)dailyLogs=JSON.parse(jn);}catch(e){}loadSettings();loadClasses();loadSchedule();migrateV36();restoreLastCtx();cur=SPORTS.team.find(s=>s.id===termRec().team)||SPORTS.team[0];renderSubs();renderTermPick();render();initTab2();
+// ===================== التوزيعات: التوزيع السنوي =====================
+let yearPlans={},ypLevel='سنة أولى ثانوي',ypEdit=false,_ypT=null;
+const YP_COLORS={none:'#ffffff',pink:'#e9b8b6',blue:'#8ecae0',orange:'#f8bd8e',green:'#74c95c',yellow:'#ffe84d',purple:'#8a4bb0',gold:'#ffc000',gray:'#cfcfcf'};
+const YP_CNAMES={none:'بدون لون',pink:'وردي',blue:'أزرق',orange:'برتقالي',green:'أخضر',yellow:'أصفر',purple:'بنفسجي',gold:'ذهبي',gray:'رمادي'};
+function persistYP(){try{localStorage.setItem('delbaz_eps_yearplan',JSON.stringify(yearPlans));}catch(e){}}
+function loadYP(){try{const r=localStorage.getItem('delbaz_eps_yearplan');if(r)yearPlans=JSON.parse(r)||{};}catch(e){yearPlans={};}}
+function ypDefault(){
+  const W=(m,d,s,c,a,o)=>Object.assign({m:m,d:d,s:s,c:c,a:a},o||{});
+  const t=(n)=>'حصة تعليمية '+n;
+  return [
+    W('سبتمبر',['','21','22','23','24'],'حصة تعارف','green',''),
+    W('',['27','28','29','30','-'],'أنشطة تحضيرية','pink','T1'),
+    W('أكتوبر',['-','-','-','-','01'],'','pink','T1',{mu:1}),
+    W('',['04','05','06','07','08'],'تقويم أولي (تشخيصي)','pink','T1'),
+    W('',['11','12','13','14','15'],t('01'),'pink','T1'),
+    W('',['18','19','20','21','22'],t('02'),'pink','T1'),
+    W('',['25','26','27','28','29'],t('03'),'pink','T1',{h:[3,4]}),
+    W('نوفمبر',['01','02','03','04','05'],t('04'),'pink','T1',{h:[0]}),
+    W('',['08','09','10','11','12'],t('05'),'pink','T1'),
+    W('',['15','16','17','18','19'],t('06'),'pink','T1'),
+    W('',['22','23','24','25','26'],'حصة تقويم تحصيلي','pink','T1'),
+    W('',['29','30','-','-','-'],'تقويم أولي (تشخيصي)','blue','T2'),
+    W('ديسمبر',['-','-','01','02','03'],'','blue','T2',{mu:1}),
+    W('',['06','07','08','09','10'],'اختبارات كتابية (فصل أول)','gold','T2'),
+    W('',['13','14','15','16','17'],t('01'),'blue','T2'),
+    W('',['20','21','22','23','24'],'عطلة الشتاء','none','T2'),
+    W('',['27','28','29','30','31'],'','none','T2',{mu:1}),
+    W('جانفي',['03','04','05','06','07'],t('02'),'blue','T2'),
+    W('',['10','11','12','13','14'],t('03'),'blue','T2',{h:[2]}),
+    W('',['17','18','19','20','21'],t('04'),'blue','T2'),
+    W('',['24','25','26','27','28'],t('05'),'blue','T2'),
+    W('',['31','-','-','-','-'],t('06'),'blue','T2'),
+    W('فيفري',['-','01','02','03','04'],'','blue','T2',{mu:1}),
+    W('',['07','08','09','10','11'],'حصة تقويم تحصيلي','blue','T2'),
+    W('',['14','15','16','17','18'],'تقويم أولي (تشخيصي)','orange','T3'),
+    W('',['21','22','23','24','25'],t('01'),'orange','T3'),
+    W('مارس',['28','01','02','03','04'],t('02'),'orange','T3'),
+    W('',['07','08','09','10','11'],'اختبارات كتابية (فصل ثاني)','gold','T3'),
+    W('',['14','15','16','17','18'],t('03'),'orange','T3'),
+    W('',['21','22','23','24','25'],'عطلة الربيع','none','T3'),
+    W('',['28','29','30','31','-'],'','none','T3',{mu:1}),
+    W('أفريل',['-','-','-','-','01'],'','none','T3',{mu:1}),
+    W('',['04','05','06','07','08'],t('04'),'orange','T3'),
+    W('',['11','12','13','14','15'],t('05'),'orange','T3'),
+    W('',['18','19','20','21','22'],t('06'),'orange','T3'),
+    W('',['25','26','27','28','29'],'حصة تقويم تحصيلي','orange','T3'),
+    W('ماي',['02','03','04','05','06'],'','green',''),
+    W('',['09','10','11','12','13'],'اختبارات الفصل الثالث','blue','')
+  ];
+}
+function ypGet(level){
+  if(!yearPlans[level]){
+    yearPlans[level]={school:settings.school||'',teacher:settings.teacher||'',year:'2026 / 2027',
+      sig:{t:settings.teacher||'',d:settings.dirStudies||'',i:settings.inspector||''},
+      rows:ypDefault(),
+      notes:['عطلة الخريف: 29 أكتوبر – 1 نوفمبر 2026','عطلة رأس السنة الأمازيغية: 12 جانفي 2027'],actOv:{}};
+    persistYP();
+  }
+  return yearPlans[level];
+}
+function ypAct(plan,level,k){
+  if(plan.actOv&&plan.actOv[k]!=null)return {t:plan.actOv[k],auto:false};
+  const term={T1:'الفصل الأول',T2:'الفصل الثاني',T3:'الفصل الثالث'}[k];
+  if(!term)return {t:k,auto:false};
+  let rec=null;
+  classes.filter(function(c){return c.grade===level;}).forEach(function(c){if(!rec&&termSports[c.id+'|'+term])rec=termSports[c.id+'|'+term];});
+  if(!rec&&termSports[term])rec=termSports[term];
+  rec=rec||{team:SPORTS.team[0].id,indiv:SPORTS.indiv[0].id};
+  const a=SPORTS.indiv.find(function(s){return s.id===rec.indiv;})||SPORTS.indiv[0];
+  const b=SPORTS.team.find(function(s){return s.id===rec.team;})||SPORTS.team[0];
+  return {t:a.name+' – '+b.name,auto:true};
+}
+function ypNums(rows){
+  const out=[];let c=0;
+  rows.forEach(function(r,i){
+    if(i===0||r.m){c=(r.m==='سبتمبر')?2:0;}
+    const nd=(r.d||[]).filter(function(x){return /\d/.test(x);}).length;
+    if(nd>=3){c++;out[i]=String(c).padStart(2,'0');}else out[i]='';
+  });
+  return out;
+}
+function ypTable(plan,level,edit){
+  const rows=plan.rows,nums=ypNums(rows),L=rows.length;
+  const mon=[],typ=[],act=[];
+  let mo=0,ty=0;
+  rows.forEach(function(r,i){
+    if(i===0||r.m){mo=i;mon[i]=1;}else{mon[i]=0;mon[mo]++;}
+    if(i===0||!r.mu){ty=i;typ[i]=1;}else{typ[i]=0;typ[ty]++;}
+  });
+  rows.forEach(function(r,i){act[i]=0;});
+  for(let i=0;i<L;i++){if(rows[i].a&&(i===0||rows[i-1].a!==rows[i].a)){let j=i;while(j+1<L&&rows[j+1].a===rows[i].a)j++;act[i]=j-i+1;}}
+  const ce=edit?' contenteditable="true"':'';
+  const days=['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس'];
+  let h='<table class="ypt"><thead><tr><th rowspan="2" class="ym">الشهر</th><th colspan="5">الأسبوع</th><th rowspan="2" class="yn">رقم<br>الأسبوع</th><th rowspan="2" class="ys">توزيع الحصص</th><th rowspan="2" class="ya">الأنشطة</th>'+(edit?'<th rowspan="2" class="yt no-print">أدوات</th>':'')+'</tr><tr>'+days.map(function(d){return '<th class="yd">'+d+'</th>';}).join('')+'</tr></thead><tbody>';
+  rows.forEach(function(r,i){
+    const bg=YP_COLORS[r.c]||'#fff',fg=r.c==='purple'?'#fff':'#16263a';
+    h+='<tr>';
+    if(mon[i])h+='<td class="ym2" rowspan="'+mon[i]+'"'+ce+' data-r="'+i+'" data-f="m">'+esc2(r.m||'')+'</td>';
+    for(let k=0;k<5;k++){const hl=(r.h||[]).indexOf(k)>=0;h+='<td class="ydd'+(hl?' hl':'')+'"'+ce+' data-r="'+i+'" data-d="'+k+'">'+esc2((r.d||[])[k]||'')+'</td>';}
+    h+='<td class="yn2" style="background:'+bg+';color:'+fg+'"'+ce+' data-r="'+i+'" data-f="n">'+esc2(r.n!=null&&r.n!==''?r.n:nums[i])+'</td>';
+    if(typ[i])h+='<td class="ys2" rowspan="'+typ[i]+'" style="background:'+bg+';color:'+fg+'"'+ce+' data-r="'+i+'" data-f="s">'+esc2(r.s||'')+'</td>';
+    if(act[i]){const a=ypAct(plan,level,r.a);h+='<td class="ya2" rowspan="'+act[i]+'"><div class="yav"'+ce+' data-k="'+esc2(r.a)+'">'+esc2(a.t)+'</div>'+(edit&&a.auto?'<div class="yalink no-print">🔗</div>':'')+'</td>';}
+    else if(!r.a)h+='<td class="ya2"></td>';
+    if(edit){
+      h+='<td class="yt no-print"><div class="ytb">'+
+        '<button data-a="up" data-r="'+i+'" title="للأعلى">↑</button><button data-a="dn" data-r="'+i+'" title="للأسفل">↓</button>'+
+        '<button data-a="add" data-r="'+i+'" title="إضافة صف أسفله">＋</button><button data-a="del" data-r="'+i+'" title="حذف الصف">✕</button>'+
+        '<button data-a="mu" data-r="'+i+'" title="دمج خانة النوع مع الأعلى"'+(r.mu?' class="on"':'')+'>⛓</button><button data-a="mon" data-r="'+i+'" title="بداية شهر جديد"'+(r.m?' class="on"':'')+'>شهر</button>'+
+        '<select data-a="col" data-r="'+i+'" title="لون الصف">'+Object.keys(YP_COLORS).map(function(k){return '<option value="'+k+'"'+(k===r.c?' selected':'')+'>'+YP_CNAMES[k]+'</option>';}).join('')+'</select>'+
+        '<select data-a="act" data-r="'+i+'" title="النشاط">'+[['','بلا نشاط'],['T1','نشاط ف1'],['T2','نشاط ف2'],['T3','نشاط ف3']].map(function(o){return '<option value="'+o[0]+'"'+(o[0]===(r.a||'')?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select>'+
+        '</div></td>';
+    }
+    h+='</tr>';
+  });
+  h+='</tbody></table>';
+  return h;
+}
+function ypNotes(plan,edit){
+  const ce=edit?' contenteditable="true"':'';
+  return plan.notes.map(function(n,i){return '<div class="ynote"><span'+ce+' data-n="'+i+'">'+esc2(n)+'</span>'+(edit?'<button class="no-print" data-a="deln" data-r="'+i+'">✕</button>':'')+'</div>';}).join('')+(edit?'<button class="ybtn no-print" data-a="addn" style="margin-top:4px">＋ إضافة ملاحظة / عطلة</button>':'');
+}
+function ypSign(plan,edit){
+  const ce=edit?' contenteditable="true"':'';
+  return '<div class="ysign"><div><b>الأستاذ(ة):</b><span class="ysl"'+ce+' data-s="t">'+esc2(plan.sig.t)+'</span></div><div><b>الناظر(ة):</b><span class="ysl"'+ce+' data-s="d">'+esc2(plan.sig.d)+'</span></div><div><b>المفتش(ة):</b><span class="ysl"'+ce+' data-s="i">'+esc2(plan.sig.i)+'</span></div></div>';
+}
+function renderDist(){
+  const box=document.getElementById('ypBox');if(!box)return;
+  const sel=document.getElementById('ypLevel');if(sel)sel.value=ypLevel;
+  const plan=ypGet(ypLevel),e=ypEdit,ce=e?' contenteditable="true"':'';
+  document.getElementById('ypBar').innerHTML=e
+    ?'<button class="ybtn pri" data-a="save">💾 حفظ التعديل والإغلاق</button><button class="ybtn" data-a="relink">🔗 ربط الأنشطة بالفصول</button><button class="ybtn" data-a="reset">↺ الجدول الافتراضي</button>'
+    :'<button class="ybtn pri" data-a="edit">✎ تعديل</button><button class="ybtn" data-a="print">🖨 طباعة / PDF</button>';
+  box.innerHTML=
+    '<div class="yhead"><div><b>المؤسسة:</b> <span class="ysl"'+ce+' data-h="school">'+esc2(plan.school)+'</span></div><div><b>السنة الدراسية:</b> <span class="ysl"'+ce+' data-h="year">'+esc2(plan.year)+'</span></div></div>'+
+    '<div class="yhead"><div><b>الأستاذ:</b> <span class="ysl"'+ce+' data-h="teacher">'+esc2(plan.teacher)+'</span></div></div>'+
+    '<h2 class="ytitle">التوزيع السنوي للحصص والأنشطة</h2>'+
+    (e?'<div class="settings-note no-print" style="margin-bottom:8px">كل خانة قابلة للتعديل بالنقر عليها. نقرتان على تاريخ لتمييزه بالأصفر. أزرار الأدوات على يسار كل صف: نقل، إضافة، حذف، دمج، بداية شهر، لون، نشاط. الأنشطة مرتبطة بأنشطة الفصول في التطبيق، وإن عدّلت نصّها يتوقف الربط حتى تضغط «ربط الأنشطة بالفصول».</div>':'')+
+    '<div class="ywrap">'+ypTable(plan,ypLevel,e)+'</div>'+ypNotes(plan,e)+ypSign(plan,e);
+}
+function ypSetLevel(v){ypLevel=v;ypEdit=false;renderDist();}
+function ypFlush(){clearTimeout(_ypT);persistYP();}
+function ypInput(el){
+  const plan=ypGet(ypLevel),tx=el.textContent.replace(/\s+/g,' ').trim();
+  if(el.dataset.d!=null){plan.rows[+el.dataset.r].d[+el.dataset.d]=tx;}
+  else if(el.dataset.f){const r=plan.rows[+el.dataset.r],f=el.dataset.f;if(f==='m'){r.m=tx||'';}else r[f]=tx;}
+  else if(el.dataset.k!=null){plan.actOv=plan.actOv||{};plan.actOv[el.dataset.k]=tx;}
+  else if(el.dataset.n!=null){plan.notes[+el.dataset.n]=tx;}
+  else if(el.dataset.s){plan.sig[el.dataset.s]=tx;}
+  else if(el.dataset.h){plan[el.dataset.h]=tx;}
+  else return;
+  clearTimeout(_ypT);_ypT=setTimeout(persistYP,350);
+}
+function ypAction(a,i,el){
+  const plan=ypGet(ypLevel),R=plan.rows;i=+i;
+  if(a==='edit'){ypEdit=true;}
+  else if(a==='save'){ypFlush();ypEdit=false;toast('✓ تم حفظ التوزيع السنوي');}
+  else if(a==='print'){ypPrint();return;}
+  else if(a==='relink'){plan.actOv={};}
+  else if(a==='reset'){if(!confirm('إعادة الجدول إلى الوضع الافتراضي؟ تُفقد تعديلاتك على هذا المستوى.'))return;const keep={school:plan.school,teacher:plan.teacher,year:plan.year,sig:plan.sig};yearPlans[ypLevel]=Object.assign({rows:ypDefault(),notes:['عطلة الخريف: 29 أكتوبر – 1 نوفمبر 2026','عطلة رأس السنة الأمازيغية: 12 جانفي 2027'],actOv:{}},keep);}
+  else if(a==='up'&&i>0){const t=R[i];R[i]=R[i-1];R[i-1]=t;}
+  else if(a==='dn'&&i<R.length-1){const t=R[i];R[i]=R[i+1];R[i+1]=t;}
+  else if(a==='add'){R.splice(i+1,0,{m:'',d:['','','','',''],s:'حصة تعليمية',c:R[i].c,a:R[i].a});}
+  else if(a==='del'){if(R.length<=1)return;R.splice(i,1);if(R[0])R[0].mu=0;}
+  else if(a==='mu'){if(i===0)return;R[i].mu=R[i].mu?0:1;}
+  else if(a==='mon'){R[i].m=R[i].m?'':'شهر';if(i===0&&!R[i].m)R[i].m='شهر';}
+  else if(a==='col'){R[i].c=el.value;}
+  else if(a==='act'){R[i].a=el.value;}
+  else if(a==='addn'){plan.notes.push('ملاحظة');}
+  else if(a==='deln'){plan.notes.splice(i,1);}
+  persistYP();renderDist();
+}
+const YP_CSS='.ypt{width:100%;border-collapse:collapse;font-size:11px;table-layout:auto}.ypt th,.ypt td{border:1.5px solid #333;padding:3px 4px;text-align:center;vertical-align:middle;line-height:1.35}.ypt th{background:#f6b98f;font-family:Cairo,Tajawal,sans-serif;font-weight:800}.ypt .yd{background:#fbe3d1;font-size:10px}.ym2{background:#f2c9b2;font-family:Cairo,Tajawal,sans-serif;font-weight:800;width:54px}.ydd{background:#fdeee3;font-weight:700;width:34px}.ydd.hl{background:#ffee33}.yn2{font-family:Cairo,Tajawal,sans-serif;font-weight:800;width:38px}.ys2{font-family:Cairo,Tajawal,sans-serif;font-weight:800;min-width:150px}.ya2{width:36px;background:#fbe3d1;padding:2px}.yav{writing-mode:vertical-rl;transform:rotate(180deg);font-family:Cairo,Tajawal,sans-serif;font-weight:800;margin:auto;white-space:normal;max-height:240px;line-height:1.5}.yhead{display:flex;justify-content:space-between;gap:10px;font-weight:800;font-size:13px;margin-bottom:6px}.ytitle{text-align:center;font-family:Cairo,Tajawal,sans-serif;font-weight:900;font-size:22px;color:#d9660d;margin:8px 0 10px}.ynote{background:#fff31f;border:1.5px solid #333;text-align:center;font-weight:800;padding:4px 8px;margin-top:4px;font-size:12px;color:#16263a}.ysign{display:flex;justify-content:space-between;gap:12px;margin-top:22px;font-weight:800;font-size:13px}.ysign>div{flex:1;text-align:center}.ysign .ysl{display:block;margin-top:34px;border-top:1.5px dotted #333;padding-top:3px;min-height:18px;font-weight:600}';
+function ypPrint(){
+  ypFlush();
+  const plan=ypGet(ypLevel);
+  const doc='<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>التوزيع السنوي — '+esc2(ypLevel)+'</title><style>@page{size:A4 portrait;margin:7mm}*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}body{font-family:Tajawal,sans-serif;background:#fbe9dc;margin:0;padding:8px;color:#16263a}'+YP_CSS+'.ypt{font-size:8.6px}.ypt th,.ypt td{padding:1.5px 3px}.ytitle{font-size:19px;margin:4px 0 6px}.yhead{font-size:11px}.yav{max-height:200px;font-size:9px}.ynote{font-size:10px;padding:2px 6px}.ysign{margin-top:12px;font-size:11px}.ysign .ysl{margin-top:22px}.ypbar{display:flex;gap:8px;justify-content:center;background:#0c2138;padding:9px;margin:-8px -8px 10px}.ypbar button{font-family:Cairo;font-weight:700;font-size:12px;border:none;border-radius:8px;padding:8px 16px;cursor:pointer}@media print{.ypbar{display:none}body{background:#fbe9dc}}</style></head><body><div class="ypbar"><button style="background:#27d3a4;color:#06231b" onclick="window.print()">🖨 طباعة</button><button style="background:rgba(255,255,255,.15);color:#fff" onclick="window.close()">إغلاق</button></div>'+
+    '<div class="yhead"><div><b>المؤسسة:</b> '+esc2(plan.school)+'</div><div><b>السنة الدراسية:</b> '+esc2(plan.year)+'</div></div><div class="yhead"><div><b>الأستاذ:</b> '+esc2(plan.teacher)+'</div></div><h2 class="ytitle">التوزيع السنوي للحصص والأنشطة</h2>'+
+    ypTable(plan,ypLevel,false)+ypNotes(plan,false)+ypSign(plan,false)+'</body></html>';
+  pdfPrint(doc);
+}
+function initYP(){
+  loadYP();
+  const box=document.getElementById('ypBox'),bar=document.getElementById('ypBar');if(!box||!bar)return;
+  box.addEventListener('input',function(e){const t=e.target;if(t&&t.isContentEditable)ypInput(t);});
+  box.addEventListener('dblclick',function(e){const t=e.target.closest&&e.target.closest('td.ydd');if(!t||!ypEdit)return;const plan=ypGet(ypLevel),r=plan.rows[+t.dataset.r],k=+t.dataset.d;r.h=r.h||[];const ix=r.h.indexOf(k);if(ix>=0)r.h.splice(ix,1);else r.h.push(k);persistYP();t.classList.toggle('hl');});
+  const onc=function(e){const b=e.target.closest&&e.target.closest('button[data-a]');if(b)ypAction(b.dataset.a,b.dataset.r,b);};
+  box.addEventListener('click',onc);bar.addEventListener('click',onc);
+  box.addEventListener('change',function(e){const s=e.target;if(s.tagName==='SELECT'&&s.dataset.a)ypAction(s.dataset.a,s.dataset.r,s);});
+  box.addEventListener('blur',function(e){const t=e.target;if(t&&t.isContentEditable){clearTimeout(_ypT);persistYP();}},true);
+}
+
+(function(){const st=document.createElement('style');st.textContent=YP_CSS;document.head.appendChild(st);})();
+loadWorkspaces();try{const mk=localStorage.getItem('delbaz_eps_marks');if(mk)diagMarks=JSON.parse(mk);}catch(e){}try{const cc=localStorage.getItem('delbaz_eps_crit');if(cc)customCrit=JSON.parse(cc);}catch(e){}try{const ls=localStorage.getItem('delbaz_eps_lessons');if(ls)lessonsSaved=JSON.parse(ls);}catch(e){}try{const li=localStorage.getItem('delbaz_eps_lessoninfo');if(li)lessonInfo=JSON.parse(li);}catch(e){}try{const ts=localStorage.getItem('delbaz_eps_terms');if(ts)termSports=JSON.parse(ts);}catch(e){}try{const dr=localStorage.getItem('delbaz_eps_drills');if(dr)drillEdits=JSON.parse(dr);}catch(e){}try{const jn=localStorage.getItem('delbaz_eps_dailylogs');if(jn)dailyLogs=JSON.parse(jn);}catch(e){}loadSettings();loadClasses();loadSchedule();initYP();migrateV36();restoreLastCtx();cur=SPORTS.team.find(s=>s.id===termRec().team)||SPORTS.team[0];renderSubs();renderTermPick();render();initTab2();
 setTimeout(showUpdate,800);
 window.addEventListener('load',function(){setTimeout(showUpdate,1400);});
 // تذكير لطيف بالنسخة الاحتياطية (إن مضى أكثر من 14 يوماً وهناك بيانات فعلية)
