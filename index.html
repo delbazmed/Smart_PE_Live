@@ -778,6 +778,8 @@ body.dark .qr-link{background:#10202c}
       <div id="thIndiv" class="th-grid"></div>
       <div class="th-secttl">الألعاب الجماعية</div>
       <div id="thTeam" class="th-grid"></div>
+      <div class="th-secttl">الإسعافات الأولية</div>
+      <div id="thAid" class="th-grid"></div>
       <div class="th-secttl">القانون الدولي الحديث (PDF)</div>
       <div id="thLaw" class="th-grid"></div>
     </div>
@@ -1047,8 +1049,11 @@ const isEx=function(i){return !!studentEx[i];};
 const activeCount=function(){let n=0;for(let i=0;i<students.length;i++)if(!studentEx[i])n++;return n;};
 let students=["أحمد","عمر","سارة","فاطمة","يوسف","ليلى","كريم","نور","رضا","وليد"]; // active roster (default sample)
 // ===== إصدار التطبيق وسجل التحديثات =====
-const APP_VERSION='3.7.1';
+const APP_VERSION='3.7.2';
 const CHANGELOG=[
+  {v:'الإصدار 3.7.2', items:[
+    'النظري: درس جديد «الإسعافات الأولية» (9 لوحات PDF): الأنواع، إصابات حصة التربية البدنية، الرعاف، الغثيان، الإغماء، بلع اللسان، الاختناق، الإنعاش القلبي الرئوي. مع زر التحميل والطباعة.'
+  ]},
   {v:'الإصدار 3.7.1', items:[
     'النظري: زر «⬇ تحميل PDF» بجانب الطباعة والإغلاق في كل الدروس.'
   ]},
@@ -2153,6 +2158,9 @@ const THEORY={
     {ic:'ط',name:'كرة الطائرة',meta:'المهارات والقواعد ومخطط الملعب',file:'كرة_الطائرة'},
     {ic:'س',name:'كرة السلة',meta:'المهارات والقواعد ومخطط الملعب',file:'كرة_السلة'}
   ],
+  aid:[
+    {ic:'+',name:'الإسعافات الأولية',meta:'9 لوحات: الأنواع، إصابات الحصة، الرعاف، الغثيان، الإغماء، بلع اللسان، الاختناق، الإنعاش القلبي',file:'الإسعافات_الأولية'}
+  ],
   law:[
     {ic:'ي',name:'القانون الدولي لكرة اليد',meta:'IHF · 14 صفحة + 20 سؤالاً ومفتاح التصحيح',file:'القانون_الدولي_كرة_اليد'},
     {ic:'ط',name:'القانون الدولي لكرة الطائرة',meta:'FIVB · 14 صفحة + 20 سؤالاً ومفتاح التصحيح',file:'القانون_الدولي_كرة_الطائرة'},
@@ -2169,7 +2177,7 @@ function thCard(it){
 }
 function renderTheory(){
   const g=(id,arr)=>{const el=document.getElementById(id);if(el)el.innerHTML=arr.map(thCard).join('');};
-  g('thIndiv',THEORY.indiv); g('thTeam',THEORY.team); g('thLaw',THEORY.law);
+  g('thIndiv',THEORY.indiv); g('thTeam',THEORY.team); g('thAid',THEORY.aid); g('thLaw',THEORY.law);
 }
 let _pdfUrl='',_pdfName='';
 function openPdf(file,name){
@@ -2190,7 +2198,7 @@ function closePdf(){
 function pdfDlName(file){
   // اسم لاتيني مضمون على كل المتصفحات (بعضها يُسقط الاسم العربي)
   const m={'الجري_السريع':'Sprint','الوثب_الطويل':'Long_Jump','الوثب_الثلاثي':'Triple_Jump','دفع_الجلة':'Shot_Put','كرة_اليد':'Handball','كرة_الطائرة':'Volleyball','كرة_السلة':'Basketball',
-    'القانون_الدولي_كرة_اليد':'Rules_Handball','القانون_الدولي_كرة_الطائرة':'Rules_Volleyball','القانون_الدولي_كرة_السلة':'Rules_Basketball'};
+    'الإسعافات_الأولية':'First_Aid','القانون_الدولي_كرة_اليد':'Rules_Handball','القانون_الدولي_كرة_الطائرة':'Rules_Volleyball','القانون_الدولي_كرة_السلة':'Rules_Basketball'};
   return 'Delbaz_EPS_'+(m[file]||'Lesson')+'.pdf';
 }
 function downloadPdf(){
